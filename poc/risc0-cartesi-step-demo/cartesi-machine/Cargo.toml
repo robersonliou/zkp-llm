@@ -1,0 +1,29 @@
+[package]
+name = "cartesi-counter-guest"
+version = "0.1.0"
+edition = "2021"
+license = "MIT"
+description = """
+Trivial Cartesi machine guest used as the workload-under-proof for Demo B.
+Increments an in-memory counter `N` times and writes the final value to stdout.
+Pure stdlib RISC-V Linux binary — no Cartesi SDK dependency to keep build
+trivial (we only need *some* deterministic RISC-V workload to step over).
+"""
+
+[[bin]]
+name = "counter"
+path = "src/main.rs"
+
+# Tight release profile so the resulting RISC-V ELF is small and the Cartesi
+# machine reaches its halt instruction quickly. We want only a few thousand
+# mcycles per run for the step-proof demo.
+[profile.release]
+opt-level = "z"
+lto = true
+codegen-units = 1
+panic = "abort"
+strip = true
+
+[profile.dev]
+opt-level = 1
+panic = "abort"

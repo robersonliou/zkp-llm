@@ -1,0 +1,7 @@
+artefacts/
+dist/
+cartesi-machine/target/
+**/target/
+.git/
+.gitignore
+README.md

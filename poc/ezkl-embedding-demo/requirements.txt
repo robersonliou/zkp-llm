@@ -1,0 +1,25 @@
+# Pinned for Day 5/6 PoC reproducibility.
+# EZKL 22.3.0 = last stable in 22.x major (current latest is 23.0.5, see
+# https://github.com/zkonduit/ezkl/releases ; chose 22.3.0 for conservatism per
+# "State of EZKL" guidance: https://blog.ezkl.xyz/post/state_of_ezkl/).
+#
+# If 22.3.0 wheel is unavailable for your platform, fallbacks (in order):
+#   ezkl==22.2.4
+#   ezkl==21.0.3
+#   ezkl==23.0.5  (latest, slightly newer API surface)
+ezkl==22.3.0
+
+# Tiny ONNX export only; CPU-only torch wheels keep image small (~250 MB vs 2 GB GPU).
+# Pinned to a stable 2.4.x line; any 2.x with onnx export support works.
+torch==2.4.1 --index-url https://download.pytorch.org/whl/cpu
+
+# ONNX runtime for sanity-checking the exported model before EZKL ingests it.
+onnx==1.16.2
+onnxruntime==1.19.2
+
+# Numeric / IO helpers.
+numpy==1.26.4
+
+# Notebook support (only used by notebook.ipynb; not required for headless run-all).
+jupyter==1.0.0
+ipykernel==6.29.5

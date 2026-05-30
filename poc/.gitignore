@@ -1,0 +1,22 @@
+# Generated demo outputs.
+**/artefacts/
+
+# Cached release downloads / build products.
+**/dist/
+
+# Rust build output.
+**/target/
+
+# Python venvs and bytecode.
+**/.venv/
+**/__pycache__/
+*.pyc
+.ipynb_checkpoints/
+
+# Editor cruft.
+.vscode/
+.idea/
+*.swp
+
+# Course notebook
+ezkl-embedding-demo/src/notebook.ipynb
