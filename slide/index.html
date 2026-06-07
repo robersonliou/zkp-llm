@@ -1,0 +1,2041 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ZKP in LLM — Verifiable AI Agent on Cartesi</title>
+
+  <!-- KaTeX -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+    onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]})"></script>
+
+  <!-- Mermaid -->
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+
+  <style>
+    /* ─── Reset & Base ─────────────────────────────────────────── */
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --bg: #0e1117;
+      --surface: #161b27;
+      --border: #2a3140;
+      --accent: #58a6ff;
+      --accent2: #3fb950;
+      --accent3: #f78166;
+      --accent4: #d2a8ff;
+      --text: #e6edf3;
+      --muted: #8b949e;
+      --yellow: #e3b341;
+      --code-bg: #1c2333;
+      --slide-w: 1280px;
+      --slide-h: 720px;
+    }
+
+    html,
+    body {
+      width: 100%;
+      height: 100%;
+      background: #050709;
+      font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+      color: var(--text);
+      overflow: hidden;
+    }
+
+    /* ─── Slide Container ──────────────────────────────────────── */
+    #deck {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .slide {
+      position: absolute;
+      width: var(--slide-w);
+      height: var(--slide-h);
+      background: var(--bg);
+      border-radius: 4px;
+      display: flex;
+      flex-direction: column;
+      padding: 36px 52px 24px;
+      overflow: hidden;
+      box-shadow: 0 8px 40px rgba(0, 0, 0, 0.7);
+      visibility: hidden;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.18s ease;
+    }
+
+    .slide.active {
+      visibility: visible;
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    /* ─── Scaling (letterbox) ──────────────────────────────────── */
+    #deck {
+      perspective: 1000px;
+    }
+
+    /* ─── Typography ───────────────────────────────────────────── */
+    .slide h1 {
+      font-size: 2.1rem;
+      font-weight: 700;
+      color: var(--accent);
+      line-height: 1.2;
+      margin-bottom: 6px;
+    }
+
+    .slide h2 {
+      font-size: 1.45rem;
+      font-weight: 700;
+      color: var(--accent);
+      border-bottom: 2px solid var(--border);
+      padding-bottom: 8px;
+      margin-bottom: 16px;
+    }
+
+    .slide h3 {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--accent4);
+      margin-bottom: 7px;
+    }
+
+    .slide p {
+      font-size: 0.9rem;
+      line-height: 1.6;
+      margin-bottom: 8px;
+      color: var(--text);
+    }
+
+    .slide ul {
+      padding-left: 1.2em;
+    }
+
+    .slide li {
+      font-size: 0.9rem;
+      line-height: 1.6;
+      color: var(--text);
+      margin-bottom: 3px;
+    }
+
+    .slide li li {
+      font-size: 0.84rem;
+      color: var(--muted);
+    }
+
+    .slide strong {
+      color: var(--yellow);
+    }
+
+    .slide em {
+      color: var(--accent4);
+      font-style: normal;
+    }
+
+    .accent {
+      color: var(--accent);
+    }
+
+    .accent2 {
+      color: var(--accent2);
+    }
+
+    .accent3 {
+      color: var(--accent3);
+    }
+
+    /* ─── Code blocks ──────────────────────────────────────────── */
+    pre {
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 10px 14px;
+      font-family: 'Consolas', 'Fira Code', monospace;
+      font-size: 0.74rem;
+      line-height: 1.5;
+      overflow-x: auto;
+      color: #cdd9e5;
+      margin: 6px 0;
+    }
+
+    code {
+      font-family: 'Consolas', 'Fira Code', monospace;
+      font-size: 0.88em;
+      color: var(--accent2);
+    }
+
+    /* ─── Tables ───────────────────────────────────────────────── */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82rem;
+      margin: 6px 0;
+    }
+
+    th {
+      background: var(--surface);
+      color: var(--accent);
+      font-weight: 600;
+      text-align: left;
+      padding: 6px 10px;
+      border-bottom: 2px solid var(--accent);
+    }
+
+    td {
+      padding: 5px 10px;
+      border-bottom: 1px solid var(--border);
+      color: var(--text);
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    tr:nth-child(even) td {
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    /* ─── Tag badges ───────────────────────────────────────────── */
+    .badge {
+      display: inline-block;
+      padding: 2px 9px;
+      border-radius: 20px;
+      font-size: 0.76rem;
+      font-weight: 600;
+      margin: 0 3px;
+    }
+
+    .badge-blue {
+      background: rgba(88, 166, 255, 0.18);
+      color: var(--accent);
+      border: 1px solid rgba(88, 166, 255, 0.4);
+    }
+
+    .badge-green {
+      background: rgba(63, 185, 80, 0.18);
+      color: var(--accent2);
+      border: 1px solid rgba(63, 185, 80, 0.4);
+    }
+
+    .badge-red {
+      background: rgba(247, 129, 102, 0.18);
+      color: var(--accent3);
+      border: 1px solid rgba(247, 129, 102, 0.4);
+    }
+
+    .badge-purple {
+      background: rgba(210, 168, 255, 0.18);
+      color: var(--accent4);
+      border: 1px solid rgba(210, 168, 255, 0.4);
+    }
+
+    .badge-yellow {
+      background: rgba(227, 179, 65, 0.18);
+      color: var(--yellow);
+      border: 1px solid rgba(227, 179, 65, 0.4);
+    }
+
+    /* ─── Layout helpers ───────────────────────────────────────── */
+    .cols {
+      display: flex;
+      gap: 24px;
+      flex: 1;
+      min-height: 0;
+    }
+
+    .col {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .col-40 {
+      flex: 0 0 40%;
+    }
+
+    .col-60 {
+      flex: 0 0 60%;
+    }
+
+    .row {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 8px;
+    }
+
+    .spacer {
+      flex: 1;
+    }
+
+    .mt8 {
+      margin-top: 6px;
+    }
+
+    .mt16 {
+      margin-top: 12px;
+    }
+
+    .fill {
+      flex: 1;
+      min-height: 0;
+      overflow: auto;
+    }
+
+    /* ─── Mermaid diagrams ─────────────────────────────────────── */
+        .mermaid-wrap {
+      flex: 1;
+      min-height: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      width: 100%;
+    }
+
+        .mermaid {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+        .mermaid svg {
+      width: 100% !important;
+      height: auto !important;
+      max-width: none !important;
+      max-height: 100% !important;
+    }
+
+    /* ─── Title slide ──────────────────────────────────────────── */
+    .slide.title-slide {
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      background: radial-gradient(ellipse at 60% 40%, #0d1f35 0%, #0e1117 60%);
+    }
+
+    .title-slide h1 {
+      font-size: 2.6rem;
+      margin-bottom: 14px;
+      background: linear-gradient(90deg, var(--accent), var(--accent4));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .title-slide .subtitle {
+      font-size: 1.1rem;
+      color: var(--muted);
+      margin-bottom: 22px;
+    }
+
+    .title-slide .meta {
+      font-size: 0.88rem;
+      color: var(--muted);
+      margin-top: 28px;
+    }
+
+    /* ─── Highlighted box ──────────────────────────────────────── */
+    .callout {
+      background: var(--surface);
+      border-left: 4px solid var(--accent);
+      border-radius: 4px;
+      padding: 9px 13px;
+      margin: 7px 0;
+      font-size: 0.86rem;
+    }
+
+    .callout.green {
+      border-left-color: var(--accent2);
+    }
+
+    .callout.yellow {
+      border-left-color: var(--yellow);
+    }
+
+    .callout.red {
+      border-left-color: var(--accent3);
+    }
+
+    /* ─── Verified badge ───────────────────────────────────────── */
+    .verified {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(63, 185, 80, 0.15);
+      border: 1px solid var(--accent2);
+      border-radius: 4px;
+      padding: 4px 12px;
+      font-size: 0.88rem;
+      color: var(--accent2);
+    }
+
+    /* ─── Footer ───────────────────────────────────────────────── */
+    .slide-footer {
+      margin-top: auto;
+      padding-top: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-top: 1px solid var(--border);
+      font-size: 0.72rem;
+      color: var(--muted);
+    }
+
+    /* ─── Controls ─────────────────────────────────────────────── */
+    #controls {
+      position: fixed;
+      bottom: 18px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: rgba(14, 17, 23, 0.85);
+      backdrop-filter: blur(8px);
+      border: 1px solid var(--border);
+      border-radius: 40px;
+      padding: 8px 18px;
+      z-index: 100;
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+
+    #controls button {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--text);
+      font-size: 1.1rem;
+      padding: 2px 6px;
+      border-radius: 4px;
+      transition: background 0.15s;
+    }
+
+    #controls button:hover {
+      background: var(--surface);
+    }
+
+    #counter {
+      min-width: 54px;
+      text-align: center;
+    }
+
+    #fullscreen-btn {
+      margin-left: 8px;
+    }
+
+    /* ─── Progress bar ─────────────────────────────────────────── */
+    #progress {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 3px;
+      background: var(--accent);
+      transition: width 0.25s;
+      z-index: 200;
+    }
+
+    /* ─── Slide number top-right ────────────────────────────────── */
+    .slide-num {
+      position: absolute;
+      top: 14px;
+      right: 22px;
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+
+    /* ─── Responsive scale ─────────────────────────────────────── */
+    #scale-wrap {
+      width: var(--slide-w);
+      height: var(--slide-h);
+      position: relative;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div id="progress"></div>
+
+  <div id="deck">
+    <div id="scale-wrap">
+
+      <!-- ══════════════════════════════════════════════════════════
+         SLIDE 1 — Title
+    ══════════════════════════════════════════════════════════ -->
+      <section class="slide title-slide active">
+        <div style="max-width:860px">
+          <div
+            style="font-size:0.95rem;color:var(--accent4);letter-spacing:0.12em;text-transform:uppercase;margin-bottom:12px;">
+            Cryptography Final Project &nbsp;·&nbsp; NCCU 11502
+          </div>
+          <h1>ZKP in LLM</h1>
+          <div class="subtitle">
+            Verifiable AI Agent on Cartesi<br>
+            From zkRAG / zkLLM to RISC0-Cartesi Verifiable LLM Services
+          </div>
+          <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:18px;">
+            <span class="badge badge-blue">EZKL · Halo2</span>
+            <span class="badge badge-green">zkRAG · HNSW</span>
+            <span class="badge badge-purple">zkLLM · tlookup</span>
+            <span class="badge badge-yellow">RISC0 · Cartesi</span>
+          </div>
+        </div>
+        <div class="meta">2026-06-07 &nbsp;|&nbsp; National Chengchi University</div>
+      </section>
+
+      <!-- ══════════════════════════════════════════════════════════
+         SLIDE 2 — Why Verify LLM Agents?
+    ══════════════════════════════════════════════════════════ -->
+      <section class="slide">
+        <span class="slide-num">2 / 27</span>
+        <h2>Why Verify LLM Agents?</h2>
+        <div class="cols">
+          <div class="col">
+            <h3>LLMs are entering high-stakes domains</h3>
+            <ul>
+              <li>Legal advisory, medical diagnosis, financial decisions</li>
+              <li>Currently: <strong>pure trust</strong> that the provider uses the claimed model + data</li>
+              <li>No cryptographic receipt — only contractual promises</li>
+            </ul>
+            <div class="mt16">
+              <h3>Regulatory pressure is real</h3>
+              <ul>
+                <li><em>NYT v. OpenAI</em> — training data provenance disputes</li>
+                <li><em>EU AI Act</em> — auditable AI system requirements</li>
+                <li><em>Taiwan FSC Generative AI Governance Guidelines</em></li>
+              </ul>
+            </div>
+          </div>
+          <div class="col">
+            <div class="callout" style="margin-top:8px;">
+              <strong>The cryptographic answer:</strong><br>
+              Attach a <em>mathematical receipt</em> to every inference.<br>
+              Verifiable in milliseconds. Model weights stay private.
+            </div>
+            <div class="mt16">
+              <h3>Three questions a ZK proof can answer</h3>
+              <ul>
+                <li>Did the provider use the <strong>committed model</strong>?</li>
+                <li>Was the <strong>retrieval step</strong> faithful to the declared index?</li>
+                <li>Is the <strong>embedding</strong> derived from the authorized encoder?</li>
+              </ul>
+            </div>
+            <div class="callout yellow mt16">
+              Goal: embed 2024–2026 frontier ZKP results into an existing DEAAP pipeline
+            </div>
+          </div>
+        </div>
+        <div class="slide-footer">
+          <span>NYT v. OpenAI · EU AI Act · Taiwan FSC AI Guidelines</span>
+          <span>ZKP in LLM</span>
+        </div>
+      </section>
+
+      <!-- ══════════════════════════════════════════════════════════
+         SLIDE 3 — Scenario: Private Verifiable RAG Query
+    ══════════════════════════════════════════════════════════ -->
+      <section class="slide">
+        <span class="slide-num">3 / 27</span>
+        <h2>Scenario: Private Verifiable RAG Query</h2>
+        <div class="cols">
+          <div class="col-60">
+            <h3>Use case — Law firm internal knowledge base</h3>
+            <ul>
+              <li>Lawyer queries proprietary contracts via a RAG-augmented LLM</li>
+              <li>Pipeline: <em>prompt engineering</em> → <em>RAG retrieval</em> → <em>LLM generation</em></li>
+            </ul>
+            <div class="mt16">
+              <h3>Attack surface — what could go wrong?</h3>
+              <ul>
+                <li><strong>Retrieval injection</strong> — provider inserts unauthorized paragraphs</li>
+                <li><strong>Model substitution</strong> — production uses a cheaper / different model</li>
+                <li><strong>Embedding drift</strong> — unauthorized encoder version used</li>
+              </ul>
+            </div>
+            <div class="mt16">
+              <h3>Three ZKP layers — one per pipeline stage</h3>
+              <table>
+                <tr>
+                  <th>Layer</th>
+                  <th>Tool</th>
+                  <th>What it proves</th>
+                </tr>
+                <tr>
+                  <td>Embedding</td>
+                  <td><strong>EZKL</strong></td>
+                  <td>Linear projection is correct</td>
+                </tr>
+                <tr>
+                  <td>Retrieval (HNSW)</td>
+                  <td><strong>zkRAG</strong></td>
+                  <td>ANN search trace is valid</td>
+                </tr>
+                <tr>
+                  <td>LLM forward pass</td>
+                  <td><strong>zkLLM</strong></td>
+                  <td>Attention + FFN are correct</td>
+                </tr>
+              </table>
+            </div>
+          </div>
+          <div class="col-40">
+            <div class="callout green" style="margin-top: 36px;">
+              <strong>Settlement layer</strong><br>
+              Cartesi v0.20.0 aggregates all proofs into a single on-chain verifier
+            </div>
+            <div class="callout" style="margin-top:16px;">
+              <strong>Trust model shift</strong><br>
+              From "wait 7 days for fraud proof window"<br>
+              → "verify cryptographic receipt in seconds"
+            </div>
+            <div class="callout yellow" style="margin-top:16px;">
+              Building the cryptographic commitment layer<br>
+              for the regulated LLM era
+            </div>
+          </div>
+        </div>
+        <div class="slide-footer">
+          <span>Motivating scenario · DEAAP private RAG pipeline</span>
+          <span>ZKP in LLM</span>
+        </div>
+      </section>
+
+      <!-- ══════════════════════════════════════════════════════════
+         SLIDE 4 — ZKP Primer: Interactive → Non-interactive
+    ══════════════════════════════════════════════════════════ -->
+      <section class="slide">
+        <span class="slide-num">4 / 27</span>
+        <h2>ZKP Primer — Interactive → Non-interactive</h2>
+        <div class="cols">
+          <div class="col">
+            <h3>Interactive Proof System (GMR 1985)</h3>
+            <ul>
+              <li><strong>Completeness</strong> — honest prover always convinces verifier</li>
+              <li><strong>Soundness</strong> — cheating prover fails with high probability</li>
+              <li><strong>Zero-knowledge</strong> — verifier learns nothing beyond the statement</li>
+            </ul>
+            <div class="mt16">
+              <h3>The limitation</h3>
+              <ul>
+                <li>Prover and verifier must be <em>online simultaneously</em></li>
+                <li>Verifier sends fresh random challenges each round</li>
+                <li>Not suitable for blockchain or offline verification</li>
+              </ul>
+            </div>
+          </div>
+          <div class="col">
+            <h3>Fiat-Shamir Heuristic — the bridge</h3>
+            <div class="callout">
+              Replace the verifier's random challenge with a <strong>cryptographic hash</strong>:
+              $$e = H(\text{transcript so far})$$
+              Prover computes the challenge deterministically → <strong>non-interactive</strong>
+            </div>
+            <div class="mt16">
+              <h3>Result: NIZK — Non-Interactive Zero-Knowledge</h3>
+              <ul>
+                <li>Proof is a single message; verifier works <em>offline</em></li>
+                <li>All modern SNARK / STARK / zkVM stand on this bridge</li>
+                <li>Course link: Week 7 Schnorr $e = H(C)$ → Fiat-Shamir transcript</li>
+              </ul>
+            </div>
+            <div class="callout green mt16">
+              <strong>Sigma protocol pattern</strong>: Commit → Challenge → Response<br>
+              Fiat-Shamir collapses the interactive round into a hash
+            </div>
+          </div>
+        </div>
+        <div class="slide-footer">
+          <span>Vitalik snarks intro · Thaler PAZK ch. 1</span>
+          <span>ZKP in LLM</span>
+        </div>
+      </section>
+
+      <!-- ══════════════════════════════════════════════════════════
+         SLIDE 5 — ZKP Family Tree
+    ══════════════════════════════════════════════════════════ -->
+      <section class="slide">
+        <span class="slide-num">5 / 27</span>
+        <h2>ZKP Family Tree</h2>
+        <div class="mermaid-wrap">
+          <div class="mermaid">
+            %%{init: {'theme': 'dark', 'themeVariables': {'primaryColor': '#1c2333', 'primaryTextColor': '#e6edf3',
+            'primaryBorderColor': '#2a3140', 'lineColor': '#58a6ff', 'edgeLabelBackground': '#161b27', 'clusterBkg':
+            '#161b27'}}}%%
+            flowchart TB
+            ip["Interactive Proofs (GMR 1985)"]
+            fs["Fiat-Shamir Heuristic"]
+            ip --> fs
+            fs --> snark["zk-SNARK family"]
+            fs --> stark["zk-STARK family"]
+            snark --> g16["Groth16"]
+            snark --> plonk["PlonK"]
+            snark --> halo2["Halo2 + lookups"]
+            stark --> starkprot["STARK (FRI)"]
+            stark --> zkvm["zkVM (RISC0, SP1, Jolt)"]
+            halo2 --> lookup["Lookup args: Plookup → logUp → cq → tlookup"]
+            lookup --> zkllm["zkLLM tlookup + zkAttn"]
+            lookup --> zkrag["zkRAG hybrid lookup"]
+            lookup --> ezkl["EZKL Halo2 pipeline"]
+            zkvm --> cartesi["Cartesi v0.20.0 RISC0 bridge"]
+          </div>
+        </div>
+        <div class="slide-footer">
+          <span>Interactive proofs → SNARK/STARK · lookup arguments lineage</span>
+          <span>ZKP in LLM</span>
+        </div>
+      </section>
+
+      <!-- ══════════════════════════════════════════════════════════
+         SLIDE 6 — From Coursework to Frontier
+    ══════════════════════════════════════════════════════════ -->
+      <section class="slide">
+        <span class="slide-num">6 / 27</span>
+        <h2>From Coursework to Frontier</h2>
+        <div class="mermaid-wrap" style="max-height: 420px;">
+          <div class="mermaid">
+            %%{init: {'theme': 'dark', 'themeVariables': {'primaryColor': '#1c2333', 'primaryTextColor': '#e6edf3',
+            'lineColor': '#58a6ff', 'edgeLabelBackground': '#161b27'}}}%%
+            flowchart LR
+            subgraph course["Course Lectures"]
+            w2["Wk 2 MAC/Hash\nh=H(M), collision"]
+            w4["Wk 4/6 PKC + Fields\nDLP/ECDLP, generator g"]
+            w7["Wk 7 Schnorr/ZK/FS\ne=H(C)"]
+            w9ss["Wk 9 Shamir SS\nf(0)=a0, Lagrange"]
+            w9q["Wk 9 Quantum\nShor breaks DLP"]
+            w10["Wk 10 MPC\ny=F(x1..xn), Yao"]
+            end
+            subgraph frontier["This Report"]
+            fs2["Fiat-Shamir\nNIZK transcript"]
+            fp["Fp circuit arithmetic\nGroth16/PlonK/Halo2"]
+            pcs["Poly commitment / FRI\nLagrange basis"]
+            pq["SNARK vs STARK\npost-quantum"]
+            mpc2["Path B Renegade\nMPC + collab SNARK"]
+            end
+            w7 -->|"e=H(C)"| fs2
+            w2 -->|"H as ROM"| fs2
+            w2 -->|"collision-free FRI"| pq
+            w4 -->|"circuit domain"| fp
+            w4 -->|"Lagrange basis"| pcs
+            w9ss -->|"low-degree test"| pcs
+            w9q -->|"hash = PQ safe"| pq
+            w10 -->|"2-party proof"| mpc2
+          </div>
+        </div>
+        <div class="slide-footer">
+          <span>Bridging course material to 2024–2026 frontier ZKP research</span>
+          <span>ZKP in LLM</span>
+        </div>
+      </section>
+
+      <!-- ══════════════════════════════════════════════════════════
+         SLIDE 7 — SNARK vs STARK
+    ══════════════════════════════════════════════════════════ -->
+      <section class="slide">
+        <span class="slide-num">7 / 27</span>
+        <h2>SNARK vs STARK — Two Main Paradigms</h2>
+        <table style="margin-top:8px;">
+          <tr>
+            <th></th>
+            <th>zk-SNARK (Groth16 / PlonK / Halo2)</th>
+            <th>zk-STARK (FRI-based)</th>
+          </tr>
+          <tr>
+            <td><strong>Proof size</strong></td>
+            <td>Hundreds of bytes – a few KB</td>
+            <td>Tens of KB – several MB</td>
+          </tr>
+          <tr>
+            <td><strong>Verifier cost</strong></td>
+            <td>$O(\log n)$ pairing / field ops</td>
+            <td>$O(\log^2 n)$ hash ops</td>
+          </tr>
+          <tr>
+            <td><strong>Trusted setup</strong></td>
+            <td>Universal (PlonK/Halo2) or per-circuit (Groth16)</td>
+            <td>Fully transparent — no trusted setup</td>
+          </tr>
+          <tr>
+            <td><strong>Post-quantum</strong></td>
+            <td><span class="badge badge-red">NO</span> (pairing-based)</td>
+            <td><span class="badge badge-green">YES</span> (hash-based)</td>
+          </tr>
+          <tr>
+            <td><strong>Representative use</strong></td>
+            <td>EVM L2 (zkSync, Scroll), zkLLM, EZKL</td>
+            <td>StarkNet, RISC Zero, Cartesi RISC0</td>
+          </tr>
+        </table>
+        <div class="cols mt16">
+          <div class="col">
+            <div class="callout">
+              <strong>Key insight:</strong> Halo2 / Plonky2 are hybrid approaches that bring lookup arguments into the
+              mainstream, bridging both paradigms.
+            </div>
+          </div>
+          <div class="col">
+            <div class="callout green">
+              <strong>This project uses both:</strong><br>
+              EZKL (Halo2/SNARK) for the embedding layer<br>
+              RISC0 (STARK) for the Cartesi step proof
+            </div>
+          </div>
+        </div>
+        <div class="slide-footer">
+          <span>SNARK vs STARK · Vitalik snarks intro</span>
+          <span>ZKP in LLM</span>
+        </div>
+      </section>
+
+      <!-- ══════════════════════════════════════════════════════════
+         SLIDE 8 — Lookup Arguments
+    ══════════════════════════════════════════════════════════ -->
+      <section class="slide">
+        <span class="slide-num">8 / 27</span>
+        <h2>Lookup Arguments — the 2024 Breakthrough</h2>
+        <div class="cols">
+          <div class="col">
+            <h3>Why lookups?</h3>
+            <ul>
+              <li>Non-arithmetic ops are <strong>circuit-unfriendly</strong>:<br>
+                Softmax, GELU, SwiGLU, range checks</li>
+              <li>Encoding them as arithmetic constraints → huge circuit size</li>
+              <li>Solution: prove <em>"every value I used is in this pre-committed table"</em></li>
+            </ul>
+            <div class="mt16">
+              <h3>Evolution timeline</h3>
+              <ul>
+                <li><strong>Plookup</strong> (Gabizon-Williamson 2020) — first practical lookup PIOP using sorted
+                  multisets</li>
+                <li><strong>logUp</strong> — log-derivative formulation, cleaner algebraic structure</li>
+                <li><strong>cq / cached quotients</strong> — preprocess table, amortize over many queries</li>
+                <li><strong>tlookup</strong> (zkLLM 2024) — tensorized, batch entire attention head at once</li>
+              </ul>
+            </div>
+          </div>
+          <div class="col">
+            <h3>Lookup core idea</h3>
+            <div class="callout">
+              Table $T = \{(x, f(x))\}$. Prover commits to witness $W$.<br>
+              Proves: <strong>every row of $W$ appears in $T$</strong><br>
+              Using: grand product / log-derivative sum check
+            </div>
+            <div class="mt16">
+              <h3>Why this unifies our three papers</h3>
+              <ul>
+                <li><span class="badge badge-purple">zkLLM</span> — tlookup for Softmax / attention</li>
+                <li><span class="badge badge-green">zkRAG</span> — hybrid lookup for neighbor lists</li>
+                <li><span class="badge badge-blue">EZKL</span> — Halo2 lookup for non-linear ops</li>
+              </ul>
+            </div>
+            <div class="callout yellow mt16">
+              Lookup arguments are the common thread connecting all three backends in this project
+            </div>
+          </div>
+        </div>
+        <div class="slide-footer">
+          <span>Plookup (Gabizon-Williamson 2020) → logUp → cq → tlookup</span>
+          <span>ZKP in LLM</span>
+        </div>
+      </section>
+
+      <!-- ══════════════════════════════════════════════════════════
+         SLIDE 9 — zkVM Landscape
+    ══════════════════════════════════════════════════════════ -->
+      <section class="slide">
+        <span class="slide-num">9 / 27</span>
+        <h2>zkVM Landscape</h2>
+        <div class="cols">
+          <div class="col">
+            <table>
+              <tr>
+                <th>zkVM</th>
+                <th>Backend</th>
+                <th>Proof size</th>
+                <th>Notes</th>
+              </tr>
+              <tr>
+                <td><strong>RISC Zero</strong></td>
+                <td>RISC-V STARK + Groth16 wrap</td>
+                <td>~200 B (wrapped)</td>
+                <td>Cartesi v0.20.0 native</td>
+              </tr>
+              <tr>
+                <td><strong>SP1</strong> (Succinct)</td>
+                <td>RISC-V STARK</td>
+                <td>–</td>
+                <td>Fenbushi 2025: fastest prove</td>
+              </tr>
+              <tr>
+                <td><strong>Jolt</strong> (a16z)</td>
+                <td>Lookup-centric</td>
+                <td>–</td>
+                <td>Theoretically elegant</td>
+              </tr>
+            </table>
+            <div class="mt16">
+              <h3>Common trade-off</h3>
+              <ul>
+                <li><span class="badge badge-green">Dev experience</span> — no need to rewrite code as circuits</li>
+                <li><span class="badge badge-red">Performance</span> — larger proof size / time vs. custom circuits</li>
+              </ul>
+            </div>
+          </div>
+          <div class="col">
+            <div class="callout" style="margin-top:12px;">
+              <strong>Why RISC Zero for DEAAP?</strong><br>
+              Cartesi v0.20.0 ships a native<br>
+              <code>cartesi-risc0-guest-step-prover.bin</code><br>
+              — no integration work required
+            </div>
+            <div class="mt16">
+              <h3>Groth16 wrapper trick</h3>
+              <ul>
+                <li>RISC Zero native STARK: ~100 KB</li>
+                <li>Groth16 outer proof of the STARK verifier: <strong>~200 bytes</strong></li>
+                <li>On-chain verification cost: ~200k gas</li>
+              </ul>
+            </div>
+            <div class="callout yellow mt16">
+              Best of both worlds: STARK's transparent setup + SNARK's compact proof for on-chain use
+            </div>
+          </div>
+        </div>
+        <div class="slide-footer">
+          <span>zkVM landscape · Fenbushi 2025 benchmark</span>
+          <span>ZKP in LLM</span>
+        </div>
+      </section>
+
+      <!-- ══════════════════════════════════════════════════════════
+         SLIDE 10 — Folding Schemes
+    ══════════════════════════════════════════════════════════ -->
+      <section class="slide">
+        <span class="slide-num">10 / 27</span>
+        <h2>Folding Schemes — Recursive Proof Compression</h2>
+        <div class="cols">
+          <div class="col">
+            <h3>The problem</h3>
+            <ul>
+              <li>Proving a long trace (e.g. 1M mcycles) in one shot → proof too large</li>
+              <li>Incrementally Verifiable Computation (IVC): prove step-by-step, accumulate</li>
+            </ul>
+            <div class="mt16">
+              <h3>Folding: fold multiple instances into one</h3>
+              <div class="callout">
+                Two R1CS instances $(x_1, w_1)$ and $(x_2, w_2)$<br>
+                → folded instance $(x, w)$ with smaller size<br>
+                Recurse until a single compact proof remains
+              </div>
+            </div>
+            <div class="mt16">
+              <h3>Lineage</h3>
+              <ul>
+                <li><strong>Nova</strong> (Microsoft 2022) — first practical folding scheme</li>
+                <li><strong>SuperNova</strong> — multi-circuit folding</li>
+                <li><strong>HyperNova</strong> (ePrint 2023/573) — CCS-based, optimal</li>
+              </ul>
+            </div>
+          </div>
+          <div class="col">
+            <h3>Tooling</h3>
+            <ul>
+              <li><code>microsoft/Nova</code> — reference implementation</li>
+              <li><code>privacy-scaling-explorations/sonobe</code> — production library</li>
+            </ul>
+            <div class="callout green mt16">
+              <strong>DEAAP future direction:</strong><br>
+              Use folding to compress N Cartesi step proofs into a single proof<br>
+              → amortize prover cost across the entire LLM inference trace
+            </div>
+            <div class="callout yellow mt16">
+              <strong>Not implemented in current PoC</strong> — identified as the primary future optimization
+            </div>
+          </div>
+        </div>
+        <div class="slide-footer">
+          <span>Folding · Nova / SuperNova / HyperNova (ePrint 2023/573)</span>
+          <span>ZKP in LLM</span>
+        </div>
+      </section>
+
+      <!-- ══════════════════════════════════════════════════════════
+         SLIDE 11 — zkLLM: Motivation & tlookup
+    ══════════════════════════════════════════════════════════ -->
+      <section class="slide">
+        <span class="slide-num">11 / 27</span>
+        <h2>zkLLM — Motivation &amp; tlookup</h2>
+        <div class="cols">
+          <div class="col">
+            <h3>Core problem</h3>
+            <ul>
+              <li>LLM inference involves <strong>non-arithmetic operations</strong>:<br>
+                Softmax, GELU, SwiGLU</li>
+              <li>Traditional SNARKs encode these as giant polynomial constraints → impractical</li>
+            </ul>
+            <div class="mt16">
+              <h3>tlookup: tensorized lookup argument</h3>
+              <ul>
+                <li>Batch an <em>entire attention head</em> or FFN block in a single PIOP</li>
+                <li>All heads share one small table</li>
+              </ul>
+            </div>
+            <div class="mt16">
+              <h3>Softmax trick — shift invariance</h3>
+              <div class="callout">
+                $$\text{softmax}(s_{ij}) = \text{softmax}(s_{ij} - \max_j s_{ij})$$
+                Subtract row-max → values fit in a small range → small table
+              </div>
+            </div>
+          </div>
+          <div class="col">
+            <h3>Base-$b$ digit decomposition</h3>
+            <div class="callout">
+              $$x = \sum_k d_k \cdot b^k, \quad \exp(x) = \prod_k \exp(d_k b^k)$$
+              Each digit $d_k$ looks up a table of size $O(b)$<br>
+              Total table size: $O(b \cdot \log_b M)$
+            </div>
+            <div class="mt16">
+              <h3>Benchmark results (paper)</h3>
+              <table>
+                <tr>
+                  <th>Model</th>
+                  <th>Prove time</th>
+                  <th>Proof size</th>
+                </tr>
+                <tr>
+                  <td>LLaMA 13B</td>
+                  <td><strong>&lt; 15 min</strong></td>
+                  <td><strong>&lt; 200 KB</strong></td>
+                </tr>
+              </table>
+            </div>
+            <div class="callout green mt16">
+              First practical ZK proof for a production-scale LLM forward pass
+            </div>
+          </div>
+        </div>
+        <div class="slide-footer">
+          <span>zkLLM (2024) · tlookup · zkAttn</span>
+          <span>ZKP in LLM</span>
+        </div>
+      </section>
+
+      <!-- ══════════════════════════════════════════════════════════
+         SLIDE 12 — zkAttn 5-Step Flow
+    ══════════════════════════════════════════════════════════ -->
+      <section class="slide">
+        <span class="slide-num">12 / 27</span>
+        <h2>zkAttn — 5-Step Attention Proof Flow</h2>
+        <div class="mermaid-wrap" style="max-height:320px;">
+          <div class="mermaid">
+            %%{init: {'theme': 'dark', 'themeVariables': {'primaryColor': '#1c2333', 'primaryTextColor': '#e6edf3',
+            'lineColor': '#58a6ff'}}}%%
+            flowchart LR
+            qkt["1. MatMul QKᵀ\n(sumcheck)"]
+            shift["2. Subtract row-max\n(shift-invariance)"]
+            digit["3. Base-b digit\ndecomposition"]
+            tlookup["4. tlookup per digit\n(batched PIOP)"]
+            out["5. MatMul softmax × V\n= attention output"]
+            qkt --> shift --> digit --> tlookup --> out
+          </div>
+        </div>
+        <div class="cols mt16">
+          <div class="col">
+            <ul>
+              <li>Steps 1 &amp; 5: standard matrix multiply → proven by <strong>sumcheck protocol</strong></li>
+              <li>Step 2: shift by row-max → ensures values stay in compact range</li>
+              <li>Step 3: base-$b$ decomposition → splits large exponent into small digit lookups</li>
+            </ul>
+          </div>
+          <div class="col">
+            <ul>
+              <li>Step 4: <strong>tlookup</strong> — all attention heads share one table → single PIOP batches
+                everything</li>
+              <li>All 5 steps are either sumcheck-friendly or lookup-friendly</li>
+            </ul>
+            <div class="callout green mt16">
+              Maps directly to the <em>LLM Agent layer</em> of the DEAAP pipeline
+            </div>
+          </div>
+        </div>
+        <div class="slide-footer">
+          <span>zkAttn · zkLLM §3</span>
+          <span>ZKP in LLM</span>
+        </div>
+      </section>
+
+      <!-- ══════════════════════════════════════════════════════════
+         SLIDE 13 — zkRAG: Motivation
+    ══════════════════════════════════════════════════════════ -->
+      <section class="slide">
+        <span class="slide-num">13 / 27</span>
+        <h2>zkRAG — Verifiable Approximate Nearest Neighbor Search</h2>
+        <div class="cols">
+          <div class="col">
+            <h3>Released: 2026-04-12 — first HNSW-specific PIOP</h3>
+            <div class="callout red">
+              <strong>Why is HNSW hard to prove?</strong><br>
+              ANN search has <em>data-dependent</em> execution paths that are hostile to arithmetic circuits
+            </div>
+            <div class="mt16">
+              <h3>Specific challenges</h3>
+              <ul>
+                <li><strong>Priority queue</strong> push/pop — extremely expensive in arithmetic circuits</li>
+                <li><strong>Visited bitmap</strong> — sparse, irregular memory accesses</li>
+                <li><strong>Multi-level graph</strong> — random pointer traversal</li>
+                <li><strong>Distance computation</strong> — floating-point L2 / cosine</li>
+              </ul>
+            </div>
+          </div>
+          <div class="col">
+            <h3>Performance comparison</h3>
+            <table>
+              <tr>
+                <th>Approach</th>
+                <th>Prove time</th>
+              </tr>
+              <tr>
+                <td>General zkVM baseline<br><small>(1M × 128-dim)</small></td>
+                <td>Several hours</td>
+              </tr>
+              <tr>
+                <td><strong>zkRAG</strong></td>
+                <td><strong>~50 seconds</strong></td>
+              </tr>
+            </table>
+            <div class="callout green mt16">
+              <strong>~1000× speedup</strong> over a naive zkVM approach
+            </div>
+            <div class="mt16">
+              <h3>DEAAP mapping</h3>
+              <div class="callout">
+                zkRAG proves the <strong>Vector DB / Retrieval layer</strong> — the part where documents are fetched
+                from the HNSW index
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="slide-footer">
+          <span>zkRAG (2026-04-12) · HNSW verifiable ANN</span>
+          <span>ZKP in LLM</span>
+        </div>
+      </section>
+
+      <!-- ══════════════════════════════════════════════════════════
+         SLIDE 14 — zkRAG PIOP Flow
+    ══════════════════════════════════════════════════════════ -->
+      <section class="slide">
+        <span class="slide-num">14 / 27</span>
+        <h2>zkRAG — PIOP Architecture</h2>
+        <div class="mermaid-wrap" style="max-height:340px;">
+          <div class="mermaid">
+            %%{init: {'theme': 'dark', 'themeVariables': {'primaryColor': '#1c2333', 'primaryTextColor': '#e6edf3',
+            'lineColor': '#58a6ff'}}}%%
+            flowchart LR
+            query["query q"]
+            trace["HNSW search trace τ"]
+            commit["Polynomial commitments"]
+            query --> trace --> commit
+            commit --> pq["Priority-Queue Checker\n(monotone heap)"]
+            commit --> mem["Membership Selector\n(visited bitmap)"]
+            commit --> lookup["Hybrid Lookup\n(neighbor list table)"]
+            commit --> dist["Distance Check\n(L2 / cosine)"]
+            pq --> agg["batched sumcheck aggregation"]
+            mem --> agg
+            lookup --> agg
+            dist --> agg
+            agg --> snarg["Final ZK SNARG"]
+          </div>
+        </div>
+        <div class="cols mt16">
+          <div class="col">
+            <ul>
+              <li>Four specialized PIOP components, each targeting one hard sub-problem</li>
+              <li>All converge into a single batched sumcheck</li>
+            </ul>
+          </div>
+          <div class="col">
+            <div class="callout">
+              Verifier complexity: $O(\log T + \log |V|)$<br>
+              where $T$ = trace length, $|V|$ = graph size
+            </div>
+          </div>
+        </div>
+        <div class="slide-footer">
+          <span>zkRAG · four PIOP components → single SNARG</span>
+          <span>ZKP in LLM</span>
+        </div>
+      </section>
+
+      <!-- ══════════════════════════════════════════════════════════
+         SLIDE 15 — EZKL Pipeline
+    ══════════════════════════════════════════════════════════ -->
+      <section class="slide">
+        <span class="slide-num">15 / 27</span>
+        <h2>EZKL — ONNX → Halo2 → Solidity Verifier</h2>
+        <div class="mermaid-wrap" style="max-height:220px;">
+          <div class="mermaid">
+            %%{init: {'theme': 'dark', 'themeVariables': {'primaryColor': '#1c2333', 'primaryTextColor': '#e6edf3',
+            'lineColor': '#58a6ff'}}}%%
+            flowchart LR
+            onnx["ONNX model"] --> set["gen_settings"] --> cal["calibrate"] --> comp["compile_circuit"]
+            comp --> setup["setup\n(KZG SRS)"]
+            setup --> wit["gen_witness"] --> prove["prove"] --> ver["verify ✅"]
+            setup --> sol["create_evm_verifier\n(Solidity)"]
+          </div>
+        </div>
+        <div class="cols mt16">
+          <div class="col">
+            <h3>Key design decisions</h3>
+            <ul>
+              <li>Any ONNX model auto-compiled to Halo2 circuit + lookup tables</li>
+              <li>All non-arithmetic ops routed through <strong>lookup arguments</strong> (same family as zkLLM tlookup)
+              </li>
+              <li>KZG polynomial commitment with universal SRS (k=15 in our demo)</li>
+            </ul>
+          </div>
+          <div class="col">
+            <h3>Output artifacts</h3>
+            <ul>
+              <li><code>vk.key</code> — verification key for on-chain verifier</li>
+              <li><code>proof.json</code> — Halo2 proof (~82 KB)</li>
+              <li>Solidity verifier contract deployable to any EVM chain</li>
+            </ul>
+            <div class="callout green mt16">
+              This is the core tool chain for <strong>Demo A</strong>
+            </div>
+          </div>
+        </div>
+        <div class="slide-footer">
+          <span>EZKL · docs.ezkl.xyz</span>
+          <span>ZKP in LLM</span>
+        </div>
+      </section>
+
+      <!-- ══════════════════════════════════════════════════════════
+         SLIDE 16 — Benchmark Comparison
+    ══════════════════════════════════════════════════════════ -->
+      <section class="slide">
+        <span class="slide-num">16 / 27</span>
+        <h2>Benchmark Comparison — Four Backends</h2>
+        <table>
+          <tr>
+            <th>Backend</th>
+            <th>Task</th>
+            <th>Prove time</th>
+            <th>Proof size</th>
+            <th>Verifier</th>
+          </tr>
+          <tr>
+            <td><span class="badge badge-purple">zkLLM</span></td>
+            <td>LLaMA-13B forward pass</td>
+            <td><strong>&lt; 15 min</strong></td>
+            <td>&lt; 200 KB</td>
+            <td>&lt; 1 s</td>
+          </tr>
+          <tr>
+            <td><span class="badge badge-green">zkRAG</span></td>
+            <td>1M × 128-dim retrieval</td>
+            <td><strong>~50 s</strong></td>
+            <td>~MB (FRI)</td>
+            <td>$O(\log T)$</td>
+          </tr>
+          <tr>
+            <td><span class="badge badge-blue">EZKL</span></td>
+            <td>Small ONNX (~1M params)</td>
+            <td>Tens of seconds</td>
+            <td>KB range</td>
+            <td>EVM ~M gas</td>
+          </tr>
+          <tr>
+            <td><span class="badge badge-yellow">RISC0 zkVM</span></td>
+            <td>1 Cartesi mcycle step</td>
+            <td>~seconds</td>
+            <td>~100 KB STARK / ~200 B wrapped</td>
+            <td>~200k gas</td>
+          </tr>
+        </table>
+        <div class="callout red" style="margin-top:12px;">
+          <strong>Key takeaway:</strong> Different pipeline layers need different backends.
+          Do <em>not</em> brute-force the entire pipeline through a single general-purpose zkVM — the overhead would be
+          orders of magnitude larger.
+        </div>
+        <div class="callout" style="margin-top:8px;">
+          <strong>DEAAP strategy:</strong> Specialized proof per layer → aggregate via Cartesi RISC0 bridge → single
+          on-chain verifier
+        </div>
+        <div class="slide-footer">
+          <span>Benchmarks · Fenbushi 2025 · zkLLM §5 · zkRAG §5</span>
+          <span>ZKP in LLM</span>
+        </div>
+      </section>
+
+      <!-- ══════════════════════════════════════════════════════════
+         SLIDE 17 — DEAAP Pipeline Overview
+    ══════════════════════════════════════════════════════════ -->
+      <section class="slide">
+        <span class="slide-num">17 / 27</span>
+        <h2>DEAAP Pipeline — Existing Architecture</h2>
+        <div class="cols">
+          <div class="col-60">
+            <h3>Five-layer pipeline (existing)</h3>
+            <table>
+              <tr>
+                <th>#</th>
+                <th>Layer</th>
+                <th>Technology</th>
+              </tr>
+              <tr>
+                <td>1</td>
+                <td><strong>Document Ingestion</strong></td>
+                <td>PDF / OCR</td>
+              </tr>
+              <tr>
+                <td>2</td>
+                <td><strong>Embedding Layer</strong></td>
+                <td>sentence-transformers MiniLM</td>
+              </tr>
+              <tr>
+                <td>3</td>
+                <td><strong>Vector DB</strong></td>
+                <td>HNSW vector index</td>
+              </tr>
+              <tr>
+                <td>4</td>
+                <td><strong>LoRA-tuned LLM</strong></td>
+                <td>Agent backbone</td>
+              </tr>
+              <tr>
+                <td>5</td>
+                <td><strong>Multi-BU Cartesi Consensus</strong></td>
+                <td>Optimistic rollup settlement</td>
+              </tr>
+            </table>
+            <div class="callout green mt16">
+              <strong>Our approach: additive, not destructive</strong><br>
+              We do <em>not</em> rewrite the pipeline. We <em>overlay</em> a cryptographic commitment layer on top of
+              the existing architecture.
+            </div>
+          </div>
+          <div class="col-40">
+            <h3>ZKP overlay (new)</h3>
+            <ul style="margin-top:8px;">
+              <li>Layer 2 → <strong>EZKL</strong> embedding proof</li>
+              <li>Layer 3 → <strong>zkRAG</strong> retrieval proof</li>
+              <li>Layer 4 → <strong>zkLLM</strong> forward pass proof</li>
+              <li>Layer 5 → <strong>RISC0</strong> step proof via Cartesi v0.20.0</li>
+            </ul>
+            <div class="callout yellow mt16">
+              Project repo:<br>
+              <code style="font-size:0.78rem;">github.com/iiyyll01lin/<br>romantic-no-rush (202506-rc1)</code>
+            </div>
+          </div>
+        </div>
+        <div class="slide-footer">
+          <span>DEAAP · github.com/iiyyll01lin/romantic-no-rush</span>
+          <span>ZKP in LLM</span>
+        </div>
+      </section>
+
+      <!-- ══════════════════════════════════════════════════════════
+         SLIDE 18 — Cartesi v0.20.0 Highlights
+    ══════════════════════════════════════════════════════════ -->
+      <section class="slide">
+        <span class="slide-num">18 / 27</span>
+        <h2>Cartesi v0.20.0 — Release Highlights</h2>
+        <div class="cols">
+          <div class="col">
+            <h3>Released: 2026-04-09</h3>
+            <div class="callout">
+              Three key additions for ZK verifiability:
+            </div>
+            <div class="mt16">
+              <h3>1. Native RISC0 step prover binary</h3>
+              <ul>
+                <li><code>cartesi-risc0-guest-step-prover.bin</code></li>
+                <li>Proves a single Cartesi machine micro-cycle step as a RISC0 STARK</li>
+              </ul>
+            </div>
+            <div class="mt16">
+              <h3>2. State root collection API</h3>
+              <ul>
+                <li><code>cm_collect_mcycle_root_hashes</code></li>
+                <li>Collects entire execution trace state roots in one call</li>
+                <li>Enables batch proof generation</li>
+              </ul>
+            </div>
+          </div>
+          <div class="col">
+            <div class="mt16">
+              <h3>3. Solidity verifier interface</h3>
+              <ul>
+                <li><code>IRiscZeroVerifier</code> example contract</li>
+                <li>Direct EVM verification of step proofs</li>
+                <li>PR #343: C++ / Rust / Solidity three-layer implementation</li>
+              </ul>
+            </div>
+            <div class="callout green mt16">
+              <strong>Strategic significance:</strong><br>
+              Optimistic rollup gains a <em>ZK fallback channel</em><br>
+              Dispute resolution: "wait 7 days" → "verify in seconds"
+            </div>
+            <div class="callout yellow mt16">
+              Industry trend: StarkWare, Eclipse, Espresso<br>
+              are all pursuing the same hybrid rollup path
+            </div>
+          </div>
+        </div>
+        <div class="slide-footer">
+          <span>Cartesi v0.20.0 · Release notes 2026-04-09 · PR #343</span>
+          <span>ZKP in LLM</span>
+        </div>
+      </section>
+
+      <!-- ══════════════════════════════════════════════════════════
+         SLIDE 19 — RISC0 Step Prover Workflow
+    ══════════════════════════════════════════════════════════ -->
+      <section class="slide">
+        <span class="slide-num">19 / 27</span>
+        <h2>RISC0 Step Prover Workflow</h2>
+        <div class="cols">
+          <div class="col-60">
+            <h3>Four-step pipeline</h3>
+            <pre>
+# Step 1: Create machine snapshot
+cartesi-machine ... --store=./snapshot
+
+# Step 2: Collect state root hashes per mcycle
+cartesi-machine --load=./snapshot \
+    --collect-mcycle-root-hashes=./roots.bin
+
+# Step 3: Prove single mcycle step transition
+./cartesi-risc0-guest-step-prover \
+    --pre-state=roots[t].bin \
+    --post-state=roots[t+1].bin \
+    --output=step_proof.bin
+
+# Step 4: Verify on-chain via Solidity
+cast call $VERIFIER "verify(...)" $proof $PRE $POST
+          </pre>
+          </div>
+          <div class="col-40">
+            <h3>What is being proven?</h3>
+            <div class="callout">
+              The state transition:<br>
+              $$\text{pre\_root} \xrightarrow{\text{RISC-V exec}} \text{post\_root}$$
+              is a valid single Cartesi machine step
+            </div>
+            <div class="mt16">
+              <h3>Proof artifacts</h3>
+              <ul>
+                <li><code>step_proof.bin</code> — RISC0 STARK receipt</li>
+                <li><code>step.public.json</code> — <code>{pre_root, post_root, mcycle}</code></li>
+                <li>Both feed directly into <code>StepVerifier.sol</code></li>
+              </ul>
+            </div>
+            <div class="callout green mt16">
+              Maps to <strong>Demo B</strong> in our PoC
+            </div>
+          </div>
+        </div>
+        <div class="slide-footer">
+          <span>Demo B workflow · Cartesi v0.20.0 step prover</span>
+          <span>ZKP in LLM</span>
+        </div>
+      </section>
+
+      <!-- ══════════════════════════════════════════════════════════
+         SLIDE 20 — Target Architecture
+    ══════════════════════════════════════════════════════════ -->
+      <section class="slide">
+        <span class="slide-num">20 / 27</span>
+        <h2>Target Architecture: DEAAP × RISC0 × Cartesi</h2>
+        <div class="mermaid-wrap">
+          <div class="mermaid">
+            %%{init: {'theme': 'dark', 'themeVariables': {'primaryColor': '#1c2333', 'primaryTextColor': '#e6edf3',
+            'lineColor': '#58a6ff'}}}%%
+            flowchart LR
+            pdf["PDF Ingestion"]
+            embed["Embedding\nMiniLM"]
+            vdb["HNSW\nVector DB"]
+            llm["LoRA LLM"]
+            agent["LLM Agent"]
+            pdf --> embed --> vdb --> agent
+            embed --> llm --> agent
+            embed -->|witness| ezkl["EZKL\nprover"]
+            vdb -->|trace| zkrag["zkRAG\nprover"]
+            llm -->|forward| zkllm["zkLLM\nprover"]
+            agent -->|trace| cm["Cartesi\nmachine"]
+            cm --> risc0["RISC0\nstep prover"]
+            ezkl --> verifier["Solidity verifier\n(on-chain)"]
+            zkrag --> verifier
+            zkllm --> verifier
+            risc0 --> verifier
+            verifier --> l1["Multi-BU Consensus\n+ L1"]
+          </div>
+        </div>
+        <div class="slide-footer">
+          <span>DEAAP × RISC0 × Cartesi full architecture</span>
+          <span>ZKP in LLM</span>
+        </div>
+      </section>
+
+      <!-- ══════════════════════════════════════════════════════════
+         SLIDE 21 — Hybrid Rollup
+    ══════════════════════════════════════════════════════════ -->
+      <section class="slide">
+        <span class="slide-num">21 / 27</span>
+        <h2>Hybrid Rollup — Optimistic + ZK Fallback</h2>
+        <div class="cols">
+          <div class="col">
+            <h3>Before v0.20.0</h3>
+            <div class="callout red">
+              Optimistic settlement only<br>
+              → 7-day fraud proof challenge window<br>
+              → Any dispute blocks finality for a week
+            </div>
+            <div class="mt16">
+              <h3>After v0.20.0</h3>
+              <div class="callout green">
+                <ul>
+                  <li>Ordinary operation: still <strong>optimistic</strong> (low prover cost)</li>
+                  <li>On dispute or high-sensitivity settlement: submit <strong>RISC0 step proof</strong></li>
+                  <li>On-chain verification in seconds, not days</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+          <div class="col">
+            <h3>DEAAP-specific benefit</h3>
+            <ul style="margin-top:8px;">
+              <li>Multi-BU consensus: any BU disputes an LLM agent result</li>
+              <li>Challenger submits a step proof instead of waiting</li>
+              <li>Trust budget: from <em>"wait a week"</em> to <em>"wait for cryptographic verification"</em></li>
+            </ul>
+            <div class="callout yellow mt16">
+              <strong>Industry alignment</strong><br>
+              StarkWare, Eclipse, Espresso are all pursuing the same hybrid rollup design
+            </div>
+            <div class="callout mt16">
+              <strong>ZK proof cost model:</strong><br>
+              Pay for proof generation only when needed (dispute / audit)<br>
+              Amortize across optimistic path in normal operation
+            </div>
+          </div>
+        </div>
+        <div class="slide-footer">
+          <span>Hybrid rollup · Cartesi v0.20.0 design rationale</span>
+          <span>ZKP in LLM</span>
+        </div>
+      </section>
+
+      <!-- ══════════════════════════════════════════════════════════
+         SLIDE 22 — Demo A: EZKL Results
+    ══════════════════════════════════════════════════════════ -->
+      <section class="slide">
+        <span class="slide-num">22 / 27</span>
+        <h2>Demo A — Verifiable Embedding (EZKL)</h2>
+        <div class="cols">
+          <div class="col">
+            <div class="row">
+              <span class="verified">PROOF VERIFIED ✅</span>
+              <span style="color:var(--muted);font-size:0.85rem;">2026-06-05</span>
+            </div>
+            <h3 class="mt8">Model</h3>
+            <ul>
+              <li>Architecture: <strong>384→64 linear projection</strong> (simulates one sentence-transformer layer)
+              </li>
+              <li>Format: ONNX opset 11 → EZKL Halo2 circuit</li>
+              <li>Commitment: <strong>KZG</strong> with SRS k=15</li>
+            </ul>
+            <h3 class="mt8">Pipeline stages</h3>
+            <table>
+              <tr>
+                <th>#</th>
+                <th>Stage</th>
+                <th>Result</th>
+              </tr>
+              <tr>
+                <td>01</td>
+                <td>PyTorch → ONNX export</td>
+                <td><span class="badge badge-green">✅ OK</span></td>
+              </tr>
+              <tr>
+                <td>02</td>
+                <td>gen_settings → calibrate → compile → SRS → setup</td>
+                <td><span class="badge badge-green">✅ OK</span></td>
+              </tr>
+              <tr>
+                <td>03</td>
+                <td>gen_witness → prove</td>
+                <td><span class="badge badge-green">✅ OK</span></td>
+              </tr>
+              <tr>
+                <td>04</td>
+                <td>verify proof</td>
+                <td><span class="badge badge-green">✅ VERIFIED</span></td>
+              </tr>
+            </table>
+          </div>
+          <div class="col">
+            <h3>Key metrics</h3>
+            <table>
+              <tr>
+                <th>Metric</th>
+                <th>Value</th>
+              </tr>
+              <tr>
+                <td>Build time</td>
+                <td>147 s</td>
+              </tr>
+              <tr>
+                <td>Run time</td>
+                <td><strong>24 s</strong></td>
+              </tr>
+              <tr>
+                <td>Proof size</td>
+                <td><strong>82 KB</strong> (proof.json)</td>
+              </tr>
+              <tr>
+                <td>Circuit rows</td>
+                <td>14,880</td>
+              </tr>
+              <tr>
+                <td>Mean abs % error</td>
+                <td>0.29 %</td>
+              </tr>
+            </table>
+            <h3 class="mt8">Key artifacts</h3>
+            <table>
+              <tr>
+                <th>File</th>
+                <th>Size</th>
+                <th>Purpose</th>
+              </tr>
+              <tr>
+                <td><code>proof.json</code></td>
+                <td>82 KB</td>
+                <td>ZK proof body</td>
+              </tr>
+              <tr>
+                <td><code>vk.key</code></td>
+                <td>66 KB</td>
+                <td>On-chain verifier input</td>
+              </tr>
+              <tr>
+                <td><code>pk.key</code></td>
+                <td>133 MB</td>
+                <td>Proving key (prover only)</td>
+              </tr>
+            </table>
+            <div class="callout green mt8">
+              "Embedding step proved → retrieval step can be chained"
+            </div>
+          </div>
+        </div>
+        <div class="slide-footer">
+          <span>Demo A · poc/ezkl-embedding-demo/ · EZKL 22.3.0</span>
+          <span>ZKP in LLM</span>
+        </div>
+      </section>
+
+      <!-- ══════════════════════════════════════════════════════════
+         SLIDE 23 — Demo B: RISC0 × Cartesi Results
+    ══════════════════════════════════════════════════════════ -->
+      <section class="slide">
+        <span class="slide-num">23 / 27</span>
+        <h2>Demo B — RISC0 × Cartesi Step Proof</h2>
+        <div class="cols">
+          <div class="col">
+            <div class="row">
+              <span class="verified">VERIFIED ✅</span>
+              <span style="color:var(--muted);font-size:0.85rem;">mock-mode + dev-mode</span>
+            </div>
+            <h3 class="mt8">Two execution modes</h3>
+            <table>
+              <tr>
+                <th>Mode</th>
+                <th>Stage 00</th>
+                <th>Stages 02–05</th>
+              </tr>
+              <tr>
+                <td><strong>mock-mode</strong></td>
+                <td>Real STARK seal</td>
+                <td>Shape-only mock</td>
+              </tr>
+              <tr>
+                <td><strong>dev-mode</strong></td>
+                <td>Real STARK seal</td>
+                <td>Real Cartesi + dev receipt</td>
+              </tr>
+              <tr>
+                <td><em>full</em></td>
+                <td colspan="2"><em>Full STARK (needs ≥16 GB RAM)</em></td>
+              </tr>
+            </table>
+            <h3 class="mt8">Dev-mode state transition</h3>
+            <table>
+              <tr>
+                <th>Field</th>
+                <th>Value</th>
+              </tr>
+              <tr>
+                <td>pre_root</td>
+                <td><code style="font-size:0.72rem;">0xde22660f…</code></td>
+              </tr>
+              <tr>
+                <td>post_root</td>
+                <td><code style="font-size:0.72rem;">0x3b64f9b9…</code></td>
+              </tr>
+              <tr>
+                <td>mcycle_count</td>
+                <td><strong>1</strong></td>
+              </tr>
+            </table>
+          </div>
+          <div class="col">
+            <h3>Run times</h3>
+            <table>
+              <tr>
+                <th>Phase</th>
+                <th>mock-mode</th>
+                <th>dev-mode</th>
+              </tr>
+              <tr>
+                <td>Docker build</td>
+                <td colspan="2">~700 s (~28 min)</td>
+              </tr>
+              <tr>
+                <td>Pipeline run</td>
+                <td><strong>74 s</strong></td>
+                <td><strong>69 s</strong></td>
+              </tr>
+              <tr>
+                <td>Peak RAM</td>
+                <td>–</td>
+                <td>1.14 GiB</td>
+              </tr>
+            </table>
+            <h3 class="mt8">Key log output</h3>
+            <pre style="font-size:0.7rem;">
+[00] receipt verified successfully
+     against MULTIPLY_ID (real STARK seal)
+
+# mock-mode
+[MOCK] step.proof.bin verified:
+  pre_root↔post_root match, mcycle_count=100
+
+# dev-mode
+✅ Receipt is valid!
+[DEV-REAL] step.proof.bin verified:
+  pre↔post match, mcycle=1, dev-receipt=true
+          </pre>
+            <div class="callout green mt8">
+              "Dispute: from 1 week → seconds"
+            </div>
+          </div>
+        </div>
+        <div class="slide-footer">
+          <span>Demo B · poc/risc0-cartesi-step-demo/ · cargo-risczero 2.3.2 · Cartesi v0.20.0</span>
+          <span>ZKP in LLM</span>
+        </div>
+      </section>
+
+      <!-- ══════════════════════════════════════════════════════════
+         SLIDE 24 — Demo Takeaways
+    ══════════════════════════════════════════════════════════ -->
+      <section class="slide">
+        <span class="slide-num">24 / 27</span>
+        <h2>Demo Takeaways</h2>
+        <div class="cols">
+          <div class="col">
+            <h3>Demo A — EZKL lessons</h3>
+            <ul>
+              <li>EZKL <code>calibrate</code> is <strong>very sensitive to input range</strong> — always use
+                representative samples from the actual data distribution</li>
+              <li>ONNX opset 11–17 works well; opset 18/19 has reduced EZKL support</li>
+              <li>Low scale values (&lt;8) trade precision for smaller circuit — acceptable at <strong>0.29% mean abs
+                  error</strong></li>
+              <li>Proving key (<code>pk.key</code>) is 133 MB but only needed by the prover — verifier only needs
+                <code>vk.key</code> (66 KB)
+              </li>
+            </ul>
+          </div>
+          <div class="col">
+            <h3>Demo B — RISC0 × Cartesi lessons</h3>
+            <ul>
+              <li>RISC0 toolchain first-time compile: <strong>~30 minutes</strong> (cargo install dominated)</li>
+              <li><code>RISC0_DEV_MODE=1</code> skips witness generation → dev receipts are <em>not real STARK
+                  proofs</em></li>
+              <li>Full STARK proof requires ≥16 GB RAM — not practical on a laptop</li>
+              <li>Mock-mode is valuable for pipeline shape validation before committing to full compute</li>
+            </ul>
+            <div class="callout green mt16">
+              <strong>Architectural insight:</strong><br>
+              Both backends share the same Solidity verifier entry point<br>
+              → dispatcher pattern makes the system extensible to more provers
+            </div>
+            <div class="callout yellow mt16">
+              Future stretch goal: feed EZKL proof into Cartesi machine → "proof of proof" chain
+            </div>
+          </div>
+        </div>
+        <div class="slide-footer">
+          <span>Demo A + B takeaways</span>
+          <span>ZKP in LLM</span>
+        </div>
+      </section>
+
+      <!-- ══════════════════════════════════════════════════════════
+         SLIDE 25 — Future Directions
+    ══════════════════════════════════════════════════════════ -->
+      <section class="slide">
+        <span class="slide-num">25 / 27</span>
+        <h2>Future Directions</h2>
+        <div class="cols">
+          <div class="col">
+            <h3>DeFi Privacy — Dark Pool Order Matching</h3>
+            <ul>
+              <li><code>cartesi-stock-exchanger</code> already implements order matching</li>
+              <li>Extend ZKP to <strong>dark pool / private order matching</strong></li>
+            </ul>
+            <div class="mt16">
+              <h3>Related projects</h3>
+              <ul>
+                <li><strong>Renegade.fi</strong> — MPC + ZK collaborative SNARK for private matching; no order balance
+                  leakage even to counterparty</li>
+                <li><strong>Singularity DarkSwap</strong> — ZK-based dark pool architecture</li>
+                <li><strong>Darklake</strong> — privacy-preserving AMM</li>
+              </ul>
+            </div>
+            <div class="callout yellow mt16">
+              Common thread: <em>anonymous identity + DeFi privacy</em><br>
+              ZKP enables "prove I have a valid order without revealing its size"
+            </div>
+          </div>
+          <div class="col">
+            <h3>Folding / Recursion + RAG Audit</h3>
+            <ul>
+              <li><strong>HyperNova</strong> (ePrint 2023/573) + Sonobe library</li>
+              <li>Fold N Cartesi step proofs → single proof, amortize cost</li>
+            </ul>
+            <div class="mt16">
+              <h3>RAG faithfulness proofs</h3>
+              <ul>
+                <li><strong>LatentAudit</strong> — Groth16 proof of RAG faithfulness</li>
+                <li><strong>Proof-Carrying Answers</strong> — Merkle-authenticated vector index</li>
+              </ul>
+            </div>
+            <div class="mt16">
+              <h3>Open research problems</h3>
+              <ul>
+                <li>Scale zkLLM to 100B+ parameter models</li>
+                <li>End-to-end proof composition across all RAG layers</li>
+                <li>ZK + TEE hybrid trust models</li>
+                <li>Standardize proof format and verifier interface</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="slide-footer">
+          <span>Renegade / Singularity / Darklake · HyperNova · LatentAudit</span>
+          <span>ZKP in LLM</span>
+        </div>
+      </section>
+
+      <!-- ══════════════════════════════════════════════════════════
+         SLIDE 26 — Limitations & Outlook
+    ══════════════════════════════════════════════════════════ -->
+      <section class="slide">
+        <span class="slide-num">26 / 27</span>
+        <h2>Limitations &amp; Outlook</h2>
+        <div class="cols">
+          <div class="col">
+            <h3>Current limitations</h3>
+            <div class="callout red" style="margin-bottom:12px;">
+              <strong>Scale ceiling</strong><br>
+              zkLLM covers up to 13B params — research-grade only.<br>
+              DeepSeek / GPT-4 class models have no published feasible solution yet.
+            </div>
+            <div class="callout red" style="margin-bottom:12px;">
+              <strong>Prover hardware requirements</strong><br>
+              Current work primarily relies on single A100 GPU.<br>
+              Distributed prover networks are the next research frontier.
+            </div>
+            <div class="callout red">
+              <strong>Proof composition standards gap</strong><br>
+              Proof format, verifier interface, and composition specs are not yet standardized across tools.
+            </div>
+          </div>
+          <div class="col">
+            <h3>Regulatory alignment gap</h3>
+            <div class="callout yellow" style="margin-bottom:12px;">
+              EU AI Act audit log requirements and ZK proofs have not been formally connected — no mature compliance
+              framework yet.
+            </div>
+            <h3 class="mt16">Promising outlook</h3>
+            <ul>
+              <li>zkLLM / zkRAG / EZKL all released in 2024–2026 — field is accelerating fast</li>
+              <li>Cartesi v0.20.0 makes ZK fallback production-ready for rollups</li>
+              <li>Lookup arguments continue to improve — each new paper cuts prover time significantly</li>
+              <li>Hardware acceleration (GPU/FPGA provers) narrowing the practicality gap</li>
+            </ul>
+            <div class="callout green mt16">
+              The infrastructure is converging toward making verifiable LLM services economically viable within the next
+              2–3 years
+            </div>
+          </div>
+        </div>
+        <div class="slide-footer">
+          <span>Limitations · Fenbushi 2025 · EU AI Act</span>
+          <span>ZKP in LLM</span>
+        </div>
+      </section>
+
+      <!-- ══════════════════════════════════════════════════════════
+         SLIDE 27 — Q&A
+    ══════════════════════════════════════════════════════════ -->
+      <section class="slide title-slide">
+        <span class="slide-num">27 / 27</span>
+        <div style="max-width:820px;text-align:center;">
+          <h1 style="margin-bottom:20px;">Q &amp; A</h1>
+          <div style="font-size:1.1rem;color:var(--muted);margin-bottom:32px;">
+            Thank you for listening
+          </div>
+          <div style="text-align:left;display:inline-block;">
+            <h3 style="color:var(--accent4);margin-bottom:12px;">Expected questions</h3>
+            <ul style="font-size:0.95rem;">
+              <li><strong>Why not prove the entire pipeline with one zkVM?</strong><br>
+                <span style="color:var(--muted);font-size:0.88rem;">Orders of magnitude slower — see benchmark slide.
+                  Specialized per-layer provers are 100–1000× faster.</span>
+              </li>
+              <li class="mt8"><strong>What is the difference between tlookup and Plookup?</strong><br>
+                <span style="color:var(--muted);font-size:0.88rem;">Plookup works element-wise; tlookup is tensorized —
+                  it batches an entire attention head in one PIOP using a shared table.</span>
+              </li>
+              <li class="mt8"><strong>How does Cartesi v0.20.0 compare to OP Stack / Arbitrum Stylus?</strong><br>
+                <span style="color:var(--muted);font-size:0.88rem;">Cartesi uses a full Linux VM (RISC-V), enabling
+                  richer off-chain compute. v0.20.0 adds ZK fallback that OP Stack lacks natively.</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+    </div><!-- #scale-wrap -->
+  </div><!-- #deck -->
+
+  <!-- ─── Navigation Controls ──────────────────────────────── -->
+  <div id="controls">
+    <button id="prev-btn" title="Previous (← or Backspace)">&#8592;</button>
+    <span id="counter">1 / 27</span>
+    <button id="next-btn" title="Next (→ or Space)">&#8594;</button>
+    <button id="fullscreen-btn" title="Toggle fullscreen (F)">&#x26F6;</button>
+  </div>
+
+  <script>
+    // ─── Mermaid init ─────────────────────────────────────────
+    mermaid.initialize({
+      startOnLoad: false,
+      theme: 'dark',
+      themeVariables: {
+        background: '#0e1117',
+        primaryColor: '#1c2333',
+        primaryTextColor: '#e6edf3',
+        primaryBorderColor: '#2a3140',
+        lineColor: '#58a6ff',
+        secondaryColor: '#161b27',
+        tertiaryColor: '#161b27',
+        edgeLabelBackground: '#161b27',
+        clusterBkg: '#161b27',
+        titleColor: '#e6edf3',
+        nodeTextColor: '#e6edf3',
+      },
+      flowchart: { htmlLabels: true, curve: 'basis', useMaxWidth: false },
+      securityLevel: 'loose',
+    });
+    // Strip fixed height + max-width Mermaid injects, let CSS control sizing
+    function fixMermaidSVGs() {
+      document.querySelectorAll('.mermaid-wrap svg').forEach(function(svg) {
+        svg.removeAttribute('height');
+        svg.style.removeProperty('max-width');
+        svg.style.width  = '100%';
+        svg.style.height = 'auto';
+      });
+    }
+
+    mermaid.run({ nodes: document.querySelectorAll('.mermaid') })
+      .then(fixMermaidSVGs)
+      .catch(function() { setTimeout(fixMermaidSVGs, 600); });
+
+
+    // ─── Slide engine ─────────────────────────────────────────
+    const slides = Array.from(document.querySelectorAll('.slide'));
+    const counter = document.getElementById('counter');
+    const progress = document.getElementById('progress');
+    const total = slides.length;
+    let current = 0;
+
+    function show(idx) {
+      slides[current].classList.remove('active');
+      current = (idx + total) % total;
+      slides[current].classList.add('active');
+      counter.textContent = `${current + 1} / ${total}`;
+      progress.style.width = `${((current + 1) / total) * 100}%`;
+    }
+
+    document.getElementById('prev-btn').addEventListener('click', () => show(current - 1));
+    document.getElementById('next-btn').addEventListener('click', () => show(current + 1));
+
+    document.addEventListener('keydown', (e) => {
+      if (['ArrowRight', ' '].includes(e.key)) { e.preventDefault(); show(current + 1); }
+      if (['ArrowLeft', 'Backspace'].includes(e.key)) { e.preventDefault(); show(current - 1); }
+      if (e.key === 'f' || e.key === 'F') { toggleFullscreen(); }
+    });
+
+    // ─── Scaling (letterbox) ──────────────────────────────────
+    const wrap = document.getElementById('scale-wrap');
+    function scaleSlides() {
+      const sw = window.innerWidth, sh = window.innerHeight;
+      const scale = Math.min(sw / 1280, sh / 720);
+      wrap.style.transform = `scale(${scale})`;
+      wrap.style.transformOrigin = 'top left';
+      wrap.style.left = `${(sw - 1280 * scale) / 2}px`;
+      wrap.style.top = `${(sh - 720 * scale) / 2}px`;
+      wrap.style.position = 'absolute';
+    }
+    window.addEventListener('resize', scaleSlides);
+    scaleSlides();
+
+    // ─── Fullscreen ───────────────────────────────────────────
+    function toggleFullscreen() {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(() => { });
+      } else {
+        document.exitFullscreen();
+      }
+    }
+    document.getElementById('fullscreen-btn').addEventListener('click', toggleFullscreen);
+
+    // Init progress bar
+    progress.style.width = `${(1 / total) * 100}%`;
+  </script>
+</body>
+
+</html>
