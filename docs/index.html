@@ -381,9 +381,8 @@
     /* ─── Controls ─────────────────────────────────────────────── */
     #controls {
       position: fixed;
-      bottom: 18px;
       left: 50%;
-      transform: translateX(-50%);
+      transform: translateX(-50%) translateY(-100%);
       display: flex;
       align-items: center;
       gap: 12px;
@@ -1245,26 +1244,27 @@
           </div>
           <div class="col">
             <div class="callout" style="margin-top:12px;">
-              <strong>Why RISC Zero for DEAAP?</strong><br>
-              Cartesi v0.20.0 ships a native<br>
-              <code>cartesi-risc0-guest-step-prover.bin</code><br>
-              — no integration work required
+              <strong>Groth16 wrapping — proof of a proof</strong><br>
+              RISC Zero's STARK verifier is itself a circuit → wrap it in Groth16<br>
+              This is <em>recursive proof composition</em>: one SNARK certifies the correctness of another proof system
             </div>
             <div class="mt16">
-              <h3>Groth16 wrapper trick</h3>
+              <h3>Security assumptions compared</h3>
               <ul>
-                <li>RISC Zero native STARK: ~100 KB</li>
-                <li>Groth16 outer proof of the STARK verifier: <strong>~200 bytes</strong></li>
-                <li>On-chain verification cost: ~200k gas</li>
+                <li>STARK (FRI): collision-resistant hash only → <span class="badge badge-green">post-quantum</span>
+                </li>
+                <li>Groth16 (outer): bilinear pairing → <span class="badge badge-red">not post-quantum</span></li>
+                <li>Wrapped proof inherits <em>both</em> — transparency from STARK, compactness from Groth16</li>
               </ul>
             </div>
             <div class="callout yellow mt16">
-              Best of both worlds: STARK's transparent setup + SNARK's compact proof for on-chain use
+              zkVM overhead: ISA circuit ≈ 10–100× the cost of a hand-written circuit for the same computation
             </div>
           </div>
         </div>
         <div class="slide-footer">
-          <span>zkVM landscape · Fenbushi 2025 benchmark</span>
+          <span>zkVM landscape · RISC Zero (Ben-Sasson et al. 2018 STARK) · ePrint 2021/370 (Nova) · Jolt (a16z
+            2023)</span>
           <span>ZKP in LLM</span>
         </div>
       </section>
@@ -1306,17 +1306,19 @@
               <li><code>privacy-scaling-explorations/sonobe</code> — production library</li>
             </ul>
             <div class="callout green mt16">
-              <strong>DEAAP future direction:</strong><br>
-              Use folding to compress N Cartesi step proofs into a single proof<br>
-              → amortize prover cost across the entire LLM inference trace
+              <strong>Why folding works — Schwartz-Zippel:</strong><br>
+              $w' = w_1 + r \cdot w_2$ with random $r \in \mathbb{F}_p$<br>
+              Two distinct polynomials agree on a random point with prob. $\leq d/p \approx 0$<br>
+              → folded $w'$ satisfies both constraints with overwhelming probability
             </div>
             <div class="callout yellow mt16">
-              <strong>Not implemented in current PoC</strong> — identified as the primary future optimization
+              <strong>Not implemented in current PoC</strong> — IVC requires the verifier circuit to be embeddable
+              inside the next step's circuit (constant overhead)
             </div>
           </div>
         </div>
         <div class="slide-footer">
-          <span>Folding · Nova / SuperNova / HyperNova (ePrint 2023/573)</span>
+          <span>Folding · Nova ePrint 2021/370 · SuperNova ePrint 2022/1758 · HyperNova ePrint 2023/573</span>
           <span>ZKP in LLM</span>
         </div>
       </section>
@@ -1378,7 +1380,7 @@
           </div>
         </div>
         <div class="slide-footer">
-          <span>zkLLM (2024) · tlookup · zkAttn</span>
+          <span>zkLLM arXiv 2404.16109 · Plookup ePrint 2020/315 · tlookup / zkAttn</span>
           <span>ZKP in LLM</span>
         </div>
       </section>
@@ -1417,12 +1419,13 @@
               <li>All 5 steps are either sumcheck-friendly or lookup-friendly</li>
             </ul>
             <div class="callout green mt16">
-              Maps directly to the <em>LLM Agent layer</em> of the DEAAP pipeline
+              Design principle: every step is either <em>sumcheck-friendly</em> or <em>lookup-friendly</em> — no step
+              requires brute-force circuit encoding
             </div>
           </div>
         </div>
         <div class="slide-footer">
-          <span>zkAttn · zkLLM §3</span>
+          <span>zkAttn · zkLLM arXiv 2404.16109 §3 · Sumcheck: Thaler PAZK §4</span>
           <span>ZKP in LLM</span>
         </div>
       </section>
@@ -1470,16 +1473,17 @@
               <strong>~1000× speedup</strong> over a naive zkVM approach
             </div>
             <div class="mt16">
-              <h3>DEAAP mapping</h3>
+              <h3>Design insight</h3>
               <div class="callout">
-                zkRAG proves the <strong>Vector DB / Retrieval layer</strong> — the part where documents are fetched
-                from the HNSW index
+                <strong>Prove the trace, not re-execute</strong><br>
+                Verifying a sorted output is $O(n)$; sorting inside a circuit is far more expensive.<br>
+                zkRAG applies the same principle to HNSW: prover runs the search, then proves the trace is valid.
               </div>
             </div>
           </div>
         </div>
         <div class="slide-footer">
-          <span>zkRAG (2026-04-12) · HNSW verifiable ANN</span>
+          <span>zkRAG (2026-04-12) · arXiv 2504.08986 · HNSW: Malkov &amp; Yashunin 2016</span>
           <span>ZKP in LLM</span>
         </div>
       </section>
@@ -1532,7 +1536,7 @@
           </div>
         </div>
         <div class="slide-footer">
-          <span>zkRAG · four PIOP components → single SNARG</span>
+          <span>zkRAG arXiv 2504.08986 · four PIOP components → single SNARG</span>
           <span>ZKP in LLM</span>
         </div>
       </section>
@@ -1593,7 +1597,7 @@
           </div>
         </div>
         <div class="slide-footer">
-          <span>EZKL · docs.ezkl.xyz</span>
+          <span>EZKL · docs.ezkl.xyz · github.com/zkonduit/ezkl · Halo2 book: zcash.github.io/halo2</span>
           <span>ZKP in LLM</span>
         </div>
       </section>
@@ -1631,14 +1635,14 @@
             <td>Small ONNX (~1M params)</td>
             <td>Tens of seconds</td>
             <td>KB range</td>
-            <td>EVM ~M gas</td>
+            <td>O(log n) KZG</td>
           </tr>
           <tr>
             <td><span class="badge badge-yellow">RISC0 zkVM</span></td>
             <td>1 Cartesi mcycle step</td>
             <td>~seconds</td>
             <td>~100 KB STARK / ~200 B wrapped</td>
-            <td>~200k gas</td>
+            <td>O(1) pairing</td>
           </tr>
         </table>
         <div class="callout red" style="margin-top:12px;">
@@ -1647,11 +1651,11 @@
           orders of magnitude larger.
         </div>
         <div class="callout" style="margin-top:8px;">
-          <strong>DEAAP strategy:</strong> Specialized proof per layer → aggregate via Cartesi RISC0 bridge → single
-          on-chain verifier
+          <strong>Design principle:</strong> Specialized PIOP per algorithmic structure → each layer uses the
+          cryptographic tool best suited to its computation
         </div>
         <div class="slide-footer">
-          <span>Benchmarks · Fenbushi 2025 · zkLLM §5 · zkRAG §5</span>
+          <span>zkLLM arXiv 2404.16109 §5 · zkRAG arXiv 2504.08986 §5 · Fenbushi 2025 benchmark</span>
           <span>ZKP in LLM</span>
         </div>
       </section>
@@ -2382,6 +2386,13 @@ cast call $VERIFIER "verify(...)" $proof $PRE $POST
       wrap.style.left = `${(sw - 1280 * scale) / 2}px`;
       wrap.style.top = `${(sh - 720 * scale) / 2}px`;
       wrap.style.position = 'absolute';
+      // Position controls pill so its centre sits on the footer's top border
+      // Footer top in slide-space = 720 - bottomPad(24) - footerH(26) = 670px
+      const footerBorderInSlide = 670;
+      const slideTop = (sh - 720 * scale) / 2;
+      const footerBorderVP = slideTop + footerBorderInSlide * scale;
+      const ctrl = document.getElementById('controls');
+      ctrl.style.top = footerBorderVP + 'px';
     }
     window.addEventListener('resize', scaleSlides);
     scaleSlides();
