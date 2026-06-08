@@ -12,9 +12,6 @@
   <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
     onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]})"></script>
 
-  <!-- Mermaid -->
-  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
-
   <style>
     /* ─── Reset & Base ─────────────────────────────────────────── */
     *,
@@ -295,8 +292,8 @@
       overflow: auto;
     }
 
-    /* ─── Mermaid diagrams ─────────────────────────────────────── */
-        .mermaid-wrap {
+    /* ─── Diagram containers ───────────────────────────────────── */
+    .mermaid-wrap {
       flex: 1;
       min-height: 0;
       display: flex;
@@ -304,21 +301,6 @@
       justify-content: center;
       overflow: hidden;
       width: 100%;
-    }
-
-        .mermaid {
-      width: 100%;
-      height: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-        .mermaid svg {
-      width: 100% !important;
-      height: auto !important;
-      max-width: none !important;
-      max-height: 100% !important;
     }
 
     /* ─── Title slide ──────────────────────────────────────────── */
@@ -465,6 +447,280 @@
       height: var(--slide-h);
       position: relative;
     }
+
+    /* --- Cover slide ----------------------------------------------- */
+    .cover-slide {
+      background: radial-gradient(ellipse at 30% 50%, #0d1f35 0%, #0e1117 70%);
+      align-items: center;
+      justify-content: center;
+    }
+
+    .cover-body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+    }
+
+    .nccu-brand {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 18px;
+    }
+
+    .nccu-seal {
+      width: 76px;
+      height: 76px;
+      margin-bottom: 8px;
+    }
+
+    .nccu-name-zh {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--text);
+      letter-spacing: 0.18em;
+    }
+
+    .nccu-name-en {
+      font-size: 0.74rem;
+      color: var(--muted);
+      letter-spacing: 0.1em;
+      margin-top: 2px;
+    }
+
+    .cover-hr {
+      width: 320px;
+      height: 1px;
+      background: var(--border);
+      margin: 14px 0;
+    }
+
+    .cover-course {
+      font-size: 0.82rem;
+      color: var(--accent4);
+      letter-spacing: 0.08em;
+      margin-bottom: 8px;
+      text-align: center;
+    }
+
+    .cover-h1 {
+      font-size: 2.8rem;
+      font-weight: 800;
+      margin-bottom: 6px;
+      background: linear-gradient(90deg, var(--accent), var(--accent4));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .cover-sub {
+      font-size: 0.98rem;
+      color: var(--muted);
+      margin-bottom: 22px;
+    }
+
+    .cover-members {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      margin-bottom: 10px;
+    }
+
+    .cv-member {
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .cv-id {
+      font-size: 0.72rem;
+      color: var(--muted);
+      margin-top: 2px;
+      text-align: center;
+    }
+
+    .cv-sep {
+      color: var(--border);
+      font-size: 1.3rem;
+    }
+
+    .cover-date {
+      font-size: 0.78rem;
+      color: var(--muted);
+    }
+
+    /* --- Section divider slides ------------------------------------ */
+    .divider-slide {
+      background: linear-gradient(135deg, #0d1f35 0%, #0e1117 55%, #150d20 100%);
+      align-items: flex-start;
+      justify-content: center;
+      padding-left: 110px;
+    }
+
+    .dv-part {
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 10px;
+    }
+
+    .dv-title {
+      font-size: 2.5rem;
+      font-weight: 800;
+      color: var(--text);
+      line-height: 1.1;
+      margin-bottom: 6px;
+    }
+
+    .dv-b .dv-title {
+      color: var(--accent4);
+    }
+
+    .dv-c .dv-title {
+      color: var(--accent2);
+    }
+
+    .dv-presenter {
+      font-size: 0.88rem;
+      color: var(--muted);
+      margin-bottom: 24px;
+    }
+
+    .dv-outline {
+      list-style: none;
+      padding: 0;
+      border-left: 3px solid var(--border);
+      padding-left: 18px;
+    }
+
+    .dv-outline li {
+      font-size: 0.86rem;
+      color: var(--muted);
+      line-height: 1.9;
+    }
+
+    .dv-range {
+      margin-top: 20px;
+      font-size: 0.74rem;
+      color: var(--border);
+      letter-spacing: 0.05em;
+    }
+
+    /* ── Pure-HTML flowchart ──────────────────────────────────────── */
+    .fc {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-wrap: nowrap;
+      gap: 0;
+      width: 100%;
+      height: 100%;
+    }
+
+    .fc-col {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    .fc-row {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: center;
+      gap: 0;
+    }
+
+    .fc-node {
+      background: #1c2333;
+      border: 1.5px solid #2a3140;
+      border-radius: 5px;
+      padding: 6px 10px;
+      font-size: 0.75rem;
+      line-height: 1.35;
+      text-align: center;
+      color: #e6edf3;
+      white-space: pre-line;
+      min-width: 80px;
+    }
+
+    .fc-node.accent {
+      border-color: #58a6ff;
+      color: #58a6ff;
+    }
+
+    .fc-node.green {
+      border-color: #3fb950;
+      color: #3fb950;
+    }
+
+    .fc-node.purple {
+      border-color: #d2a8ff;
+      color: #d2a8ff;
+    }
+
+    .fc-node.yellow {
+      border-color: #e3b341;
+      color: #e3b341;
+    }
+
+    .fc-node.muted {
+      border-color: #444c56;
+      color: #8b949e;
+    }
+
+    .fc-group {
+      border: 1px dashed #2a3140;
+      border-radius: 8px;
+      padding: 10px 14px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .fc-group-label {
+      font-size: 0.68rem;
+      color: #8b949e;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+
+    /* arrows */
+    .fc-arr {
+      color: #58a6ff;
+      font-size: 1rem;
+      line-height: 1;
+      display: flex;
+      align-items: center;
+      padding: 0 4px;
+    }
+
+    .fc-arr-d {
+      color: #58a6ff;
+      font-size: 1rem;
+      line-height: 1;
+      display: flex;
+      justify-content: center;
+    }
+
+    .fc-lbl {
+      font-size: 0.62rem;
+      color: #8b949e;
+      padding: 0 3px;
+      white-space: nowrap;
+    }
+
+    .fc-lbl-d {
+      font-size: 0.62rem;
+      color: #8b949e;
+      text-align: center;
+    }
   </style>
 </head>
 
@@ -475,28 +731,57 @@
   <div id="deck">
     <div id="scale-wrap">
 
-      <!-- ══════════════════════════════════════════════════════════
-         SLIDE 1 — Title
-    ══════════════════════════════════════════════════════════ -->
-      <section class="slide title-slide active">
-        <div style="max-width:860px">
-          <div
-            style="font-size:0.95rem;color:var(--accent4);letter-spacing:0.12em;text-transform:uppercase;margin-bottom:12px;">
-            Cryptography Final Project &nbsp;·&nbsp; NCCU 11502
+      <!-- COVER ================================================== -->
+      <section class="slide cover-slide active">
+        <span class="slide-num"></span>
+        <div class="cover-body">
+          <div class="nccu-brand">
+            <svg class="nccu-seal" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="50" cy="50" r="46" stroke="#58a6ff" stroke-width="2" />
+              <circle cx="50" cy="50" r="38" stroke="#58a6ff" stroke-width="0.6" stroke-dasharray="4 3" />
+              <text x="50" y="48" text-anchor="middle" dominant-baseline="middle" font-size="20" font-weight="bold"
+                fill="#58a6ff" font-family="serif">政大</text>
+              <text x="50" y="66" text-anchor="middle" font-size="7" fill="#8b949e" letter-spacing="1">NCCU</text>
+              <text x="50" y="33" text-anchor="middle" font-size="6" fill="#8b949e" letter-spacing="1">EST. 1927</text>
+            </svg>
+            <div class="nccu-name-zh">國立政治大學</div>
+            <div class="nccu-name-en">National Chengchi University</div>
           </div>
-          <h1>ZKP in LLM</h1>
-          <div class="subtitle">
-            Verifiable AI Agent on Cartesi<br>
-            From zkRAG / zkLLM to RISC0-Cartesi Verifiable LLM Services
-          </div>
-          <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:18px;">
-            <span class="badge badge-blue">EZKL · Halo2</span>
-            <span class="badge badge-green">zkRAG · HNSW</span>
-            <span class="badge badge-purple">zkLLM · tlookup</span>
-            <span class="badge badge-yellow">RISC0 · Cartesi</span>
+          <div class="cover-hr"></div>
+          <div class="cover-course">密碼學 &nbsp;&middot;&nbsp; NCCU 11402 &nbsp;&middot;&nbsp; 期末專題</div>
+          <div class="cover-h1">ZKP in LLM</div>
+          <div class="cover-sub">Verifiable AI Agent on Cartesi</div>
+          <div class="cover-members">
+            <div style="display:flex;flex-direction:column;align-items:center;">
+              <span class="cv-member">林穎彥</span>
+              <span class="cv-id">113971012</span>
+            </div>
+            <span class="cv-sep">&middot;</span>
+            <div style="display:flex;flex-direction:column;align-items:center;">
+              <span class="cv-member">劉書傳</span>
+              <span class="cv-id">108971017</span>
+            </div>
+            <span class="cv-sep">&middot;</span>
+            <div style="display:flex;flex-direction:column;align-items:center;">
+              <span class="cv-member">王雅麗</span>
+              <span class="cv-id">113971009</span>
+            </div>
           </div>
         </div>
-        <div class="meta">2026-06-07 &nbsp;|&nbsp; National Chengchi University</div>
+      </section>
+
+      <!-- DIVIDER A — Part I ====================================== -->
+      <section class="slide divider-slide">
+        <span class="slide-num"></span>
+        <div class="dv-part">Part I</div>
+        <div class="dv-title">ZKP Theory Foundation</div>
+        <ul class="dv-outline">
+          <li>Why Verify LLM Agents? &amp; Motivating Scenario</li>
+          <li>ZKP Primer — Interactive → Non-interactive (Fiat-Shamir)</li>
+          <li>ZKP Family Tree &amp; Coursework Connections</li>
+          <li>SNARK vs STARK &amp; Lookup Arguments</li>
+        </ul>
+        <div class="dv-range">Slides 3 – 10</div>
       </section>
 
       <!-- ══════════════════════════════════════════════════════════
@@ -672,27 +957,46 @@
       <section class="slide">
         <span class="slide-num">5 / 27</span>
         <h2>ZKP Family Tree</h2>
-        <div class="mermaid-wrap">
-          <div class="mermaid">
-            %%{init: {'theme': 'dark', 'themeVariables': {'primaryColor': '#1c2333', 'primaryTextColor': '#e6edf3',
-            'primaryBorderColor': '#2a3140', 'lineColor': '#58a6ff', 'edgeLabelBackground': '#161b27', 'clusterBkg':
-            '#161b27'}}}%%
-            flowchart TB
-            ip["Interactive Proofs (GMR 1985)"]
-            fs["Fiat-Shamir Heuristic"]
-            ip --> fs
-            fs --> snark["zk-SNARK family"]
-            fs --> stark["zk-STARK family"]
-            snark --> g16["Groth16"]
-            snark --> plonk["PlonK"]
-            snark --> halo2["Halo2 + lookups"]
-            stark --> starkprot["STARK (FRI)"]
-            stark --> zkvm["zkVM (RISC0, SP1, Jolt)"]
-            halo2 --> lookup["Lookup args: Plookup → logUp → cq → tlookup"]
-            lookup --> zkllm["zkLLM tlookup + zkAttn"]
-            lookup --> zkrag["zkRAG hybrid lookup"]
-            lookup --> ezkl["EZKL Halo2 pipeline"]
-            zkvm --> cartesi["Cartesi v0.20.0 RISC0 bridge"]
+        <div class="mermaid-wrap" style="align-items:flex-start;padding-top:4px;">
+          <div class="fc" style="flex-direction:column;gap:6px;font-size:0.78rem;">
+            <!-- Row 0: root -->
+            <div class="fc-node accent" style="width:260px;">Interactive Proofs (GMR 1985)</div>
+            <div class="fc-arr-d">↓</div>
+            <div class="fc-node accent" style="width:180px;">Fiat-Shamir Heuristic</div>
+            <!-- Row 1: SNARK / STARK -->
+            <div class="fc-arr-d" style="display:flex;gap:80px;">
+              ↙&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↘</div>
+            <div class="fc-row" style="gap:40px;align-items:flex-start;">
+              <!-- Left: SNARK -->
+              <div class="fc-col" style="gap:4px;">
+                <div class="fc-node accent" style="width:160px;">zk-SNARK family</div>
+                <div class="fc-arr-d" style="display:flex;gap:20px;">↙ ↓ ↘</div>
+                <div class="fc-row" style="gap:6px;">
+                  <div class="fc-node" style="width:64px;">Groth16</div>
+                  <div class="fc-node" style="width:56px;">PlonK</div>
+                  <div class="fc-node purple" style="width:100px;">Halo2 + lookups</div>
+                </div>
+                <div class="fc-arr-d">↓</div>
+                <div class="fc-node yellow" style="width:290px;">Lookup args: Plookup → logUp → cq → tlookup</div>
+                <div class="fc-arr-d" style="display:flex;gap:10px;">↙ ↓ ↘</div>
+                <div class="fc-row" style="gap:6px;">
+                  <div class="fc-node purple" style="width:110px;font-size:0.7rem;">zkLLM tlookup + zkAttn</div>
+                  <div class="fc-node green" style="width:100px;font-size:0.7rem;">zkRAG hybrid lookup</div>
+                  <div class="fc-node accent" style="width:100px;font-size:0.7rem;">EZKL Halo2 pipeline</div>
+                </div>
+              </div>
+              <!-- Right: STARK -->
+              <div class="fc-col" style="gap:4px;">
+                <div class="fc-node green" style="width:150px;">zk-STARK family</div>
+                <div class="fc-arr-d" style="display:flex;gap:16px;">↙ ↘</div>
+                <div class="fc-row" style="gap:6px;">
+                  <div class="fc-node" style="width:80px;">STARK (FRI)</div>
+                  <div class="fc-node green" style="width:130px;">zkVM&#10;(RISC0, SP1, Jolt)</div>
+                </div>
+                <div class="fc-arr-d">↓</div>
+                <div class="fc-node yellow" style="width:220px;font-size:0.7rem;">Cartesi v0.20.0 RISC0 bridge</div>
+              </div>
+            </div>
           </div>
         </div>
         <div class="slide-footer">
@@ -707,34 +1011,62 @@
       <section class="slide">
         <span class="slide-num">6 / 27</span>
         <h2>From Coursework to Frontier</h2>
-        <div class="mermaid-wrap" style="max-height: 420px;">
-          <div class="mermaid">
-            %%{init: {'theme': 'dark', 'themeVariables': {'primaryColor': '#1c2333', 'primaryTextColor': '#e6edf3',
-            'lineColor': '#58a6ff', 'edgeLabelBackground': '#161b27'}}}%%
-            flowchart LR
-            subgraph course["Course Lectures"]
-            w2["Wk 2 MAC/Hash\nh=H(M), collision"]
-            w4["Wk 4/6 PKC + Fields\nDLP/ECDLP, generator g"]
-            w7["Wk 7 Schnorr/ZK/FS\ne=H(C)"]
-            w9ss["Wk 9 Shamir SS\nf(0)=a0, Lagrange"]
-            w9q["Wk 9 Quantum\nShor breaks DLP"]
-            w10["Wk 10 MPC\ny=F(x1..xn), Yao"]
-            end
-            subgraph frontier["This Report"]
-            fs2["Fiat-Shamir\nNIZK transcript"]
-            fp["Fp circuit arithmetic\nGroth16/PlonK/Halo2"]
-            pcs["Poly commitment / FRI\nLagrange basis"]
-            pq["SNARK vs STARK\npost-quantum"]
-            mpc2["Path B Renegade\nMPC + collab SNARK"]
-            end
-            w7 -->|"e=H(C)"| fs2
-            w2 -->|"H as ROM"| fs2
-            w2 -->|"collision-free FRI"| pq
-            w4 -->|"circuit domain"| fp
-            w4 -->|"Lagrange basis"| pcs
-            w9ss -->|"low-degree test"| pcs
-            w9q -->|"hash = PQ safe"| pq
-            w10 -->|"2-party proof"| mpc2
+        <div class="mermaid-wrap">
+          <div style="display:flex;gap:28px;align-items:stretch;padding:8px 0;">
+            <!-- Left group: Course -->
+            <div class="fc-group" style="flex:0 0 170px;">
+              <div class="fc-group-label">Course Lectures</div>
+              <div class="fc-node" style="width:130px;">Wk2 Hash/MAC</div>
+              <div class="fc-node" style="width:130px;">Wk4/6 PKC+Fields</div>
+              <div class="fc-node" style="width:130px;">Wk7 Schnorr/FS</div>
+              <div class="fc-node" style="width:130px;">Wk9 Shamir SS</div>
+              <div class="fc-node" style="width:130px;">Wk9 Quantum</div>
+              <div class="fc-node" style="width:130px;">Wk10 MPC</div>
+            </div>
+            <!-- Middle: arrows with labels via SVG -->
+            <div style="flex:0 0 220px;align-self:stretch;">
+              <svg width="220" height="100%" xmlns="http://www.w3.org/2000/svg" style="overflow:visible;"
+                viewBox="0 0 200 320" preserveAspectRatio="none">
+                <defs>
+                  <marker id="ah" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
+                    <path d="M0,0 L6,3 L0,6 Z" fill="#58a6ff" />
+                  </marker>
+                </defs>
+                <!-- w7(FS) → fs2: row3→row1 -->
+                <line x1="0" y1="120" x2="200" y2="40" stroke="#58a6ff" stroke-width="1.2" marker-end="url(#ah)" />
+                <text x="85" y="72" fill="#8b949e" font-size="11">e=H(C)</text>
+                <!-- w2(hash) → fs2 -->
+                <line x1="0" y1="40" x2="200" y2="40" stroke="#58a6ff" stroke-width="1.2" marker-end="url(#ah)" />
+                <text x="70" y="34" fill="#8b949e" font-size="11">ROM</text>
+                <!-- w2 → pq -->
+                <line x1="0" y1="40" x2="200" y2="120" stroke="#58a6ff" stroke-width="1.2" marker-end="url(#ah)" />
+                <text x="70" y="90" fill="#8b949e" font-size="11">FRI</text>
+                <!-- w4 → fp -->
+                <line x1="0" y1="80" x2="200" y2="80" stroke="#58a6ff" stroke-width="1.2" marker-end="url(#ah)" />
+                <text x="70" y="74" fill="#8b949e" font-size="11">Fp domain</text>
+                <!-- w4 → pcs -->
+                <line x1="0" y1="80" x2="200" y2="160" stroke="#58a6ff" stroke-width="1.2" marker-end="url(#ah)" />
+                <text x="55" y="130" fill="#8b949e" font-size="11">Lagrange</text>
+                <!-- w9ss → pcs -->
+                <line x1="0" y1="160" x2="200" y2="160" stroke="#58a6ff" stroke-width="1.2" marker-end="url(#ah)" />
+                <text x="60" y="154" fill="#8b949e" font-size="11">low-deg</text>
+                <!-- w9q → pq -->
+                <line x1="0" y1="200" x2="200" y2="120" stroke="#58a6ff" stroke-width="1.2" marker-end="url(#ah)" />
+                <text x="55" y="170" fill="#8b949e" font-size="11">hash=PQ</text>
+                <!-- w10 → mpc2 -->
+                <line x1="0" y1="240" x2="200" y2="240" stroke="#58a6ff" stroke-width="1.2" marker-end="url(#ah)" />
+                <text x="60" y="234" fill="#8b949e" font-size="11">2-party</text>
+              </svg>
+            </div>
+            <!-- Right group: This Report -->
+            <div class="fc-group" style="flex:0 0 160px;">
+              <div class="fc-group-label">This Report</div>
+              <div class="fc-node accent" style="width:130px;">Fiat-Shamir NIZK</div>
+              <div class="fc-node purple" style="width:130px;">Fp circuit SNARK</div>
+              <div class="fc-node green" style="width:130px;">Poly commit FRI</div>
+              <div class="fc-node yellow" style="width:130px;">SNARK vs STARK PQ</div>
+              <div class="fc-node muted" style="width:130px;">Renegade MPC+ZK</div>
+            </div>
           </div>
         </div>
         <div class="slide-footer">
@@ -749,7 +1081,7 @@
       <section class="slide">
         <span class="slide-num">7 / 27</span>
         <h2>SNARK vs STARK — Two Main Paradigms</h2>
-        <table style="margin-top:8px;">
+        <table style="margin-top:6px;font-size:0.82rem;">
           <tr>
             <th></th>
             <th>zk-SNARK (Groth16 / PlonK / Halo2)</th>
@@ -781,7 +1113,7 @@
             <td>StarkNet, RISC Zero, Cartesi RISC0</td>
           </tr>
         </table>
-        <div class="cols mt16">
+        <div class="cols mt8">
           <div class="col">
             <div class="callout">
               <strong>Key insight:</strong> Halo2 / Plonky2 are hybrid approaches that bring lookup arguments into the
@@ -852,6 +1184,21 @@
           <span>Plookup (Gabizon-Williamson 2020) → logUp → cq → tlookup</span>
           <span>ZKP in LLM</span>
         </div>
+      </section>
+
+      <!-- DIVIDER B — Part II ===================================== -->
+      <section class="slide divider-slide dv-b">
+        <span class="slide-num"></span>
+        <div class="dv-part">Part II</div>
+        <div class="dv-title">Core Papers</div>
+        <ul class="dv-outline">
+          <li>zkVM Landscape &amp; Folding Schemes</li>
+          <li>zkLLM — tlookup &amp; zkAttn 5-Step Flow</li>
+          <li>zkRAG — Verifiable HNSW Search</li>
+          <li>EZKL — ONNX → Halo2 → Solidity Verifier</li>
+          <li>Benchmark Comparison</li>
+        </ul>
+        <div class="dv-range">Slides 12 – 19</div>
       </section>
 
       <!-- ══════════════════════════════════════════════════════════
@@ -1042,17 +1389,17 @@
       <section class="slide">
         <span class="slide-num">12 / 27</span>
         <h2>zkAttn — 5-Step Attention Proof Flow</h2>
-        <div class="mermaid-wrap" style="max-height:320px;">
-          <div class="mermaid">
-            %%{init: {'theme': 'dark', 'themeVariables': {'primaryColor': '#1c2333', 'primaryTextColor': '#e6edf3',
-            'lineColor': '#58a6ff'}}}%%
-            flowchart LR
-            qkt["1. MatMul QKᵀ\n(sumcheck)"]
-            shift["2. Subtract row-max\n(shift-invariance)"]
-            digit["3. Base-b digit\ndecomposition"]
-            tlookup["4. tlookup per digit\n(batched PIOP)"]
-            out["5. MatMul softmax × V\n= attention output"]
-            qkt --> shift --> digit --> tlookup --> out
+        <div style="display:flex;align-items:center;justify-content:center;padding:16px 0 8px;">
+          <div class="fc-row" style="gap:0;flex-wrap:nowrap;">
+            <div class="fc-node accent" style="width:110px;">1. MatMul QKᵀ&#10;(sumcheck)</div>
+            <div class="fc-arr">→</div>
+            <div class="fc-node" style="width:115px;">2. Subtract row-max&#10;(shift-invariance)</div>
+            <div class="fc-arr">→</div>
+            <div class="fc-node" style="width:110px;">3. Base-b digit&#10;decomposition</div>
+            <div class="fc-arr">→</div>
+            <div class="fc-node purple" style="width:120px;">4. tlookup per digit&#10;(batched PIOP)</div>
+            <div class="fc-arr">→</div>
+            <div class="fc-node green" style="width:120px;">5. MatMul softmax × V&#10;= attention output</div>
           </div>
         </div>
         <div class="cols mt16">
@@ -1143,24 +1490,31 @@
       <section class="slide">
         <span class="slide-num">14 / 27</span>
         <h2>zkRAG — PIOP Architecture</h2>
-        <div class="mermaid-wrap" style="max-height:340px;">
-          <div class="mermaid">
-            %%{init: {'theme': 'dark', 'themeVariables': {'primaryColor': '#1c2333', 'primaryTextColor': '#e6edf3',
-            'lineColor': '#58a6ff'}}}%%
-            flowchart LR
-            query["query q"]
-            trace["HNSW search trace τ"]
-            commit["Polynomial commitments"]
-            query --> trace --> commit
-            commit --> pq["Priority-Queue Checker\n(monotone heap)"]
-            commit --> mem["Membership Selector\n(visited bitmap)"]
-            commit --> lookup["Hybrid Lookup\n(neighbor list table)"]
-            commit --> dist["Distance Check\n(L2 / cosine)"]
-            pq --> agg["batched sumcheck aggregation"]
-            mem --> agg
-            lookup --> agg
-            dist --> agg
-            agg --> snarg["Final ZK SNARG"]
+        <div style="display:flex;align-items:center;justify-content:center;padding:10px 0 6px;">
+          <div class="fc-row" style="gap:0;align-items:center;">
+            <!-- input chain -->
+            <div class="fc-col" style="gap:4px;">
+              <div class="fc-node accent" style="width:72px;">query q</div>
+              <div class="fc-arr-d">↓</div>
+              <div class="fc-node" style="width:100px;">HNSW search&#10;trace τ</div>
+              <div class="fc-arr-d">↓</div>
+              <div class="fc-node accent" style="width:110px;">Polynomial&#10;commitments</div>
+            </div>
+            <div class="fc-arr" style="padding:0 6px;">→</div>
+            <!-- 4 PIOP components -->
+            <div class="fc-col" style="gap:6px;">
+              <div class="fc-node yellow" style="width:150px;">Priority-Queue Checker&#10;(monotone heap)</div>
+              <div class="fc-node yellow" style="width:150px;">Membership Selector&#10;(visited bitmap)</div>
+              <div class="fc-node yellow" style="width:150px;">Hybrid Lookup&#10;(neighbor list table)</div>
+              <div class="fc-node yellow" style="width:150px;">Distance Check&#10;(L2 / cosine)</div>
+            </div>
+            <div class="fc-arr" style="padding:0 6px;">→</div>
+            <!-- aggregation + output -->
+            <div class="fc-col" style="gap:4px;">
+              <div class="fc-node purple" style="width:130px;">batched sumcheck&#10;aggregation</div>
+              <div class="fc-arr-d">↓</div>
+              <div class="fc-node green" style="width:130px;">Final ZK SNARG</div>
+            </div>
           </div>
         </div>
         <div class="cols mt16">
@@ -1189,15 +1543,31 @@
       <section class="slide">
         <span class="slide-num">15 / 27</span>
         <h2>EZKL — ONNX → Halo2 → Solidity Verifier</h2>
-        <div class="mermaid-wrap" style="max-height:220px;">
-          <div class="mermaid">
-            %%{init: {'theme': 'dark', 'themeVariables': {'primaryColor': '#1c2333', 'primaryTextColor': '#e6edf3',
-            'lineColor': '#58a6ff'}}}%%
-            flowchart LR
-            onnx["ONNX model"] --> set["gen_settings"] --> cal["calibrate"] --> comp["compile_circuit"]
-            comp --> setup["setup\n(KZG SRS)"]
-            setup --> wit["gen_witness"] --> prove["prove"] --> ver["verify ✅"]
-            setup --> sol["create_evm_verifier\n(Solidity)"]
+        <div style="display:flex;flex-direction:column;align-items:center;padding:12px 0 4px;gap:8px;">
+          <!-- Main chain -->
+          <div class="fc-row" style="gap:0;flex-wrap:nowrap;">
+            <div class="fc-node" style="width:80px;">ONNX model</div>
+            <div class="fc-arr">→</div>
+            <div class="fc-node" style="width:84px;">gen_settings</div>
+            <div class="fc-arr">→</div>
+            <div class="fc-node" style="width:72px;">calibrate</div>
+            <div class="fc-arr">→</div>
+            <div class="fc-node" style="width:100px;">compile_circuit</div>
+            <div class="fc-arr">→</div>
+            <div class="fc-node accent" style="width:90px;">setup&#10;(KZG SRS)</div>
+            <div class="fc-arr">→</div>
+            <div class="fc-node" style="width:82px;">gen_witness</div>
+            <div class="fc-arr">→</div>
+            <div class="fc-node" style="width:62px;">prove</div>
+            <div class="fc-arr">→</div>
+            <div class="fc-node green" style="width:72px;">verify ✅</div>
+          </div>
+          <!-- Branch from setup -->
+          <div style="display:flex;align-items:flex-start;gap:0;margin-left:340px;">
+            <div style="display:flex;flex-direction:column;align-items:center;gap:0;">
+              <div style="font-size:0.7rem;color:#58a6ff;">↓ also</div>
+              <div class="fc-node yellow" style="width:150px;">create_evm_verifier&#10;(Solidity)</div>
+            </div>
           </div>
         </div>
         <div class="cols mt16">
@@ -1284,6 +1654,21 @@
           <span>Benchmarks · Fenbushi 2025 · zkLLM §5 · zkRAG §5</span>
           <span>ZKP in LLM</span>
         </div>
+      </section>
+
+      <!-- DIVIDER C — Part III ==================================== -->
+      <section class="slide divider-slide dv-c">
+        <span class="slide-num"></span>
+        <div class="dv-part">Part III</div>
+        <div class="dv-title">System Integration<br>+ Demo</div>
+        <ul class="dv-outline">
+          <li>DEAAP Pipeline &amp; Cartesi v0.20.0 Highlights</li>
+          <li>RISC0 Step Prover &amp; Target Architecture</li>
+          <li>Hybrid Rollup Design</li>
+          <li>Demo A (EZKL) &amp; Demo B (RISC0 × Cartesi)</li>
+          <li>Future Directions &amp; Limitations</li>
+        </ul>
+        <div class="dv-range">Slides 21 – 31</div>
       </section>
 
       <!-- ══════════════════════════════════════════════════════════
@@ -1466,28 +1851,45 @@ cast call $VERIFIER "verify(...)" $proof $PRE $POST
       <section class="slide">
         <span class="slide-num">20 / 27</span>
         <h2>Target Architecture: DEAAP × RISC0 × Cartesi</h2>
-        <div class="mermaid-wrap">
-          <div class="mermaid">
-            %%{init: {'theme': 'dark', 'themeVariables': {'primaryColor': '#1c2333', 'primaryTextColor': '#e6edf3',
-            'lineColor': '#58a6ff'}}}%%
-            flowchart LR
-            pdf["PDF Ingestion"]
-            embed["Embedding\nMiniLM"]
-            vdb["HNSW\nVector DB"]
-            llm["LoRA LLM"]
-            agent["LLM Agent"]
-            pdf --> embed --> vdb --> agent
-            embed --> llm --> agent
-            embed -->|witness| ezkl["EZKL\nprover"]
-            vdb -->|trace| zkrag["zkRAG\nprover"]
-            llm -->|forward| zkllm["zkLLM\nprover"]
-            agent -->|trace| cm["Cartesi\nmachine"]
-            cm --> risc0["RISC0\nstep prover"]
-            ezkl --> verifier["Solidity verifier\n(on-chain)"]
-            zkrag --> verifier
-            zkllm --> verifier
-            risc0 --> verifier
-            verifier --> l1["Multi-BU Consensus\n+ L1"]
+        <div style="display:flex;gap:18px;flex:1;align-items:center;justify-content:center;padding:4px 0;">
+          <!-- Left: Data pipeline -->
+          <div class="fc-group" style="gap:5px;">
+            <div class="fc-group-label">Data Pipeline</div>
+            <div class="fc-node" style="width:110px;">PDF Ingestion</div>
+            <div class="fc-arr-d">↓</div>
+            <div class="fc-node accent" style="width:130px;">Embedding MiniLM</div>
+            <div style="display:flex;gap:8px;">
+              <div class="fc-col" style="gap:4px;">
+                <div class="fc-arr-d">↓</div>
+                <div class="fc-node accent" style="width:100px;">HNSW Vector DB</div>
+              </div>
+              <div class="fc-col" style="gap:4px;">
+                <div class="fc-arr-d">↓</div>
+                <div class="fc-node accent" style="width:90px;">LoRA LLM</div>
+              </div>
+            </div>
+            <div class="fc-arr-d">↓</div>
+            <div class="fc-node green" style="width:110px;">LLM Agent</div>
+            <div class="fc-arr-d">↓</div>
+            <div class="fc-node" style="width:120px;">Cartesi machine</div>
+          </div>
+          <!-- Arrow with label -->
+          <div style="display:flex;flex-direction:column;align-items:center;gap:2px;">
+            <span style="font-size:0.62rem;color:#8b949e;">witnesses</span>
+            <span style="font-size:1.2rem;color:#58a6ff;">→</span>
+            <span style="font-size:0.62rem;color:#8b949e;">traces</span>
+          </div>
+          <!-- Right: Proof + on-chain -->
+          <div class="fc-group" style="gap:5px;">
+            <div class="fc-group-label">ZK Proof Layer → On-chain</div>
+            <div class="fc-node purple" style="width:150px;font-size:0.74rem;">EZKL prover (embedding)</div>
+            <div class="fc-node purple" style="width:150px;font-size:0.74rem;">zkRAG prover (retrieval)</div>
+            <div class="fc-node purple" style="width:150px;font-size:0.74rem;">zkLLM prover (forward pass)</div>
+            <div class="fc-node yellow" style="width:150px;font-size:0.74rem;">RISC0 step prover (Cartesi)</div>
+            <div class="fc-arr-d">↓</div>
+            <div class="fc-node green" style="width:160px;font-size:0.74rem;">Solidity verifier (on-chain)</div>
+            <div class="fc-arr-d">↓</div>
+            <div class="fc-node green" style="width:160px;font-size:0.74rem;">Multi-BU Consensus + L1</div>
           </div>
         </div>
         <div class="slide-footer">
@@ -1690,7 +2092,7 @@ cast call $VERIFIER "verify(...)" $proof $PRE $POST
               </tr>
             </table>
             <h3 class="mt8">Dev-mode state transition</h3>
-            <table>
+            <table style="font-size:0.82rem;">
               <tr>
                 <th>Field</th>
                 <th>Value</th>
@@ -1733,7 +2135,7 @@ cast call $VERIFIER "verify(...)" $proof $PRE $POST
               </tr>
             </table>
             <h3 class="mt8">Key log output</h3>
-            <pre style="font-size:0.7rem;">
+            <pre style="font-size:0.62rem;line-height:1.35;">
 [00] receipt verified successfully
      against MULTIPLY_ID (real STARK seal)
 
@@ -1918,23 +2320,7 @@ cast call $VERIFIER "verify(...)" $proof $PRE $POST
           <div style="font-size:1.1rem;color:var(--muted);margin-bottom:32px;">
             Thank you for listening
           </div>
-          <div style="text-align:left;display:inline-block;">
-            <h3 style="color:var(--accent4);margin-bottom:12px;">Expected questions</h3>
-            <ul style="font-size:0.95rem;">
-              <li><strong>Why not prove the entire pipeline with one zkVM?</strong><br>
-                <span style="color:var(--muted);font-size:0.88rem;">Orders of magnitude slower — see benchmark slide.
-                  Specialized per-layer provers are 100–1000× faster.</span>
-              </li>
-              <li class="mt8"><strong>What is the difference between tlookup and Plookup?</strong><br>
-                <span style="color:var(--muted);font-size:0.88rem;">Plookup works element-wise; tlookup is tensorized —
-                  it batches an entire attention head in one PIOP using a shared table.</span>
-              </li>
-              <li class="mt8"><strong>How does Cartesi v0.20.0 compare to OP Stack / Arbitrum Stylus?</strong><br>
-                <span style="color:var(--muted);font-size:0.88rem;">Cartesi uses a full Linux VM (RISC-V), enabling
-                  richer off-chain compute. v0.20.0 adds ZK fallback that OP Stack lacks natively.</span>
-              </li>
-            </ul>
-          </div>
+
         </div>
       </section>
 
@@ -1950,39 +2336,6 @@ cast call $VERIFIER "verify(...)" $proof $PRE $POST
   </div>
 
   <script>
-    // ─── Mermaid init ─────────────────────────────────────────
-    mermaid.initialize({
-      startOnLoad: false,
-      theme: 'dark',
-      themeVariables: {
-        background: '#0e1117',
-        primaryColor: '#1c2333',
-        primaryTextColor: '#e6edf3',
-        primaryBorderColor: '#2a3140',
-        lineColor: '#58a6ff',
-        secondaryColor: '#161b27',
-        tertiaryColor: '#161b27',
-        edgeLabelBackground: '#161b27',
-        clusterBkg: '#161b27',
-        titleColor: '#e6edf3',
-        nodeTextColor: '#e6edf3',
-      },
-      flowchart: { htmlLabels: true, curve: 'basis', useMaxWidth: false },
-      securityLevel: 'loose',
-    });
-    // Strip fixed height + max-width Mermaid injects, let CSS control sizing
-    function fixMermaidSVGs() {
-      document.querySelectorAll('.mermaid-wrap svg').forEach(function(svg) {
-        svg.removeAttribute('height');
-        svg.style.removeProperty('max-width');
-        svg.style.width  = '100%';
-        svg.style.height = 'auto';
-      });
-    }
-
-    mermaid.run({ nodes: document.querySelectorAll('.mermaid') })
-      .then(fixMermaidSVGs)
-      .catch(function() { setTimeout(fixMermaidSVGs, 600); });
 
 
     // ─── Slide engine ─────────────────────────────────────────
@@ -1998,7 +2351,17 @@ cast call $VERIFIER "verify(...)" $proof $PRE $POST
       slides[current].classList.add('active');
       counter.textContent = `${current + 1} / ${total}`;
       progress.style.width = `${((current + 1) / total) * 100}%`;
+      var numEl = slides[current].querySelector('.slide-num');
+      if (numEl) numEl.textContent = (current + 1) + ' / ' + total;
     }
+
+    function initSlideNums() {
+      slides.forEach(function (s, i) {
+        var el = s.querySelector('.slide-num');
+        if (el) el.textContent = (i + 1) + ' / ' + total;
+      });
+    }
+    initSlideNums();
 
     document.getElementById('prev-btn').addEventListener('click', () => show(current - 1));
     document.getElementById('next-btn').addEventListener('click', () => show(current + 1));
