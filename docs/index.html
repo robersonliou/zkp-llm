@@ -787,7 +787,7 @@
          SLIDE 2 — Why Verify LLM Agents?
     ══════════════════════════════════════════════════════════ -->
       <section class="slide">
-        <span class="slide-num">2 / 27</span>
+        <span class="slide-num">2 / 26</span>
         <h2>Why Verify LLM Agents?</h2>
         <div class="cols">
           <div class="col">
@@ -835,7 +835,7 @@
          SLIDE 3 — Scenario: Private Verifiable RAG Query
     ══════════════════════════════════════════════════════════ -->
       <section class="slide">
-        <span class="slide-num">3 / 27</span>
+        <span class="slide-num">3 / 26</span>
         <h2>Scenario: Private Verifiable RAG Query</h2>
         <div class="cols">
           <div class="col-60">
@@ -904,7 +904,7 @@
          SLIDE 4 — ZKP Primer: Interactive → Non-interactive
     ══════════════════════════════════════════════════════════ -->
       <section class="slide">
-        <span class="slide-num">4 / 27</span>
+        <span class="slide-num">4 / 26</span>
         <h2>ZKP Primer — Interactive → Non-interactive</h2>
         <div class="cols">
           <div class="col">
@@ -954,7 +954,7 @@
          SLIDE 5 — ZKP Family Tree
     ══════════════════════════════════════════════════════════ -->
       <section class="slide">
-        <span class="slide-num">5 / 27</span>
+        <span class="slide-num">5 / 26</span>
         <h2>ZKP Family Tree</h2>
         <div class="mermaid-wrap" style="align-items:flex-start;padding-top:4px;">
           <div class="fc" style="flex-direction:column;gap:6px;font-size:0.78rem;">
@@ -1008,7 +1008,7 @@
          SLIDE 7 — SNARK vs STARK
     ══════════════════════════════════════════════════════════ -->
       <section class="slide">
-        <span class="slide-num">7 / 27</span>
+        <span class="slide-num">7 / 26</span>
         <h2>SNARK vs STARK — Two Main Paradigms</h2>
         <table style="margin-top:6px;font-size:0.82rem;">
           <tr>
@@ -1067,7 +1067,7 @@
          SLIDE 8 — Lookup Arguments
     ══════════════════════════════════════════════════════════ -->
       <section class="slide">
-        <span class="slide-num">8 / 27</span>
+        <span class="slide-num">8 / 26</span>
         <h2>Lookup Arguments — the 2024 Breakthrough</h2>
         <div class="cols">
           <div class="col">
@@ -1122,7 +1122,7 @@
         <div class="dv-title">Core Papers</div>
         <ul class="dv-outline">
           <li>zkVM Landscape &amp; Folding Schemes</li>
-          <li>zkLLM — tlookup &amp; zkAttn 5-Step Flow</li>
+          <li>zkLLM — tlookup &amp; zkAttn</li>
           <li>zkRAG — Verifiable HNSW Search</li>
           <li>EZKL — ONNX → Halo2 → Solidity Verifier</li>
           <li>Benchmark Comparison</li>
@@ -1134,7 +1134,7 @@
          SLIDE 9 — zkVM Landscape
     ══════════════════════════════════════════════════════════ -->
       <section class="slide">
-        <span class="slide-num">9 / 27</span>
+        <span class="slide-num">9 / 26</span>
         <h2>zkVM Landscape</h2>
         <div class="cols">
           <div class="col">
@@ -1203,7 +1203,7 @@
          SLIDE 10 — Folding Schemes
     ══════════════════════════════════════════════════════════ -->
       <section class="slide">
-        <span class="slide-num">10 / 27</span>
+        <span class="slide-num">10 / 26</span>
         <h2>Folding Schemes — Recursive Proof Compression</h2>
         <div class="cols">
           <div class="col">
@@ -1257,7 +1257,7 @@
          SLIDE 11 — zkLLM: Motivation & tlookup
     ══════════════════════════════════════════════════════════ -->
       <section class="slide">
-        <span class="slide-num">11 / 27</span>
+        <span class="slide-num">11 / 26</span>
         <h2>zkLLM — Motivation &amp; tlookup</h2>
         <div class="cols">
           <div class="col">
@@ -1316,55 +1316,10 @@
       </section>
 
       <!-- ══════════════════════════════════════════════════════════
-         SLIDE 12 — zkAttn 5-Step Flow
-    ══════════════════════════════════════════════════════════ -->
-      <section class="slide">
-        <span class="slide-num">12 / 27</span>
-        <h2>zkAttn — 5-Step Attention Proof Flow</h2>
-        <div style="display:flex;align-items:center;justify-content:center;padding:16px 0 8px;">
-          <div class="fc-row" style="gap:0;flex-wrap:nowrap;">
-            <div class="fc-node accent" style="width:110px;">1. MatMul QKᵀ&#10;(sumcheck)</div>
-            <div class="fc-arr">→</div>
-            <div class="fc-node" style="width:115px;">2. Subtract row-max&#10;(shift-invariance)</div>
-            <div class="fc-arr">→</div>
-            <div class="fc-node" style="width:110px;">3. Base-b digit&#10;decomposition</div>
-            <div class="fc-arr">→</div>
-            <div class="fc-node purple" style="width:120px;">4. tlookup per digit&#10;(batched PIOP)</div>
-            <div class="fc-arr">→</div>
-            <div class="fc-node green" style="width:120px;">5. MatMul softmax × V&#10;= attention output</div>
-          </div>
-        </div>
-        <div class="cols mt16">
-          <div class="col">
-            <ul>
-              <li>Steps 1 &amp; 5: standard matrix multiply → proven by <strong>sumcheck protocol</strong></li>
-              <li>Step 2: shift by row-max → ensures values stay in compact range</li>
-              <li>Step 3: base-$b$ decomposition → splits large exponent into small digit lookups</li>
-            </ul>
-          </div>
-          <div class="col">
-            <ul>
-              <li>Step 4: <strong>tlookup</strong> — all attention heads share one table → single PIOP batches
-                everything</li>
-              <li>All 5 steps are either sumcheck-friendly or lookup-friendly</li>
-            </ul>
-            <div class="callout green mt16">
-              Design principle: every step is either <em>sumcheck-friendly</em> or <em>lookup-friendly</em> — no step
-              requires brute-force circuit encoding
-            </div>
-          </div>
-        </div>
-        <div class="slide-footer">
-          <span>zkAttn · zkLLM arXiv 2404.16109 §3 · Sumcheck: Thaler PAZK §4</span>
-          <span>ZKP in LLM</span>
-        </div>
-      </section>
-
-      <!-- ══════════════════════════════════════════════════════════
          SLIDE 13 — zkRAG: Motivation
     ══════════════════════════════════════════════════════════ -->
       <section class="slide">
-        <span class="slide-num">13 / 27</span>
+        <span class="slide-num">12 / 26</span>
         <h2>zkRAG — Verifiable Approximate Nearest Neighbor Search</h2>
         <div class="cols">
           <div class="col">
@@ -1422,7 +1377,7 @@
          SLIDE 14 — zkRAG PIOP Flow
     ══════════════════════════════════════════════════════════ -->
       <section class="slide">
-        <span class="slide-num">14 / 27</span>
+        <span class="slide-num">13 / 26</span>
         <h2>zkRAG — PIOP Architecture</h2>
         <div style="display:flex;align-items:center;justify-content:center;padding:10px 0 6px;">
           <div class="fc-row" style="gap:0;align-items:center;">
@@ -1475,7 +1430,7 @@
          SLIDE 15 — EZKL Pipeline
     ══════════════════════════════════════════════════════════ -->
       <section class="slide">
-        <span class="slide-num">15 / 27</span>
+        <span class="slide-num">14 / 26</span>
         <h2>EZKL — ONNX → Halo2 → Solidity Verifier</h2>
         <div style="display:flex;flex-direction:column;align-items:center;padding:12px 0 4px;gap:8px;">
           <!-- Main chain -->
@@ -1536,7 +1491,7 @@
          SLIDE 16 — Benchmark Comparison
     ══════════════════════════════════════════════════════════ -->
       <section class="slide">
-        <span class="slide-num">16 / 27</span>
+        <span class="slide-num">15 / 26</span>
         <h2>Benchmark Comparison — Four Backends</h2>
         <table>
           <tr>
@@ -1609,7 +1564,7 @@
          SLIDE 17 — DEAAP Pipeline Overview
     ══════════════════════════════════════════════════════════ -->
       <section class="slide">
-        <span class="slide-num">17 / 27</span>
+        <span class="slide-num">16 / 26</span>
         <h2>DEAAP Pipeline — Existing Architecture</h2>
         <div class="cols">
           <div class="col-60">
@@ -1676,7 +1631,7 @@
          SLIDE 18 — Cartesi v0.20.0 Highlights
     ══════════════════════════════════════════════════════════ -->
       <section class="slide">
-        <span class="slide-num">18 / 27</span>
+        <span class="slide-num">17 / 26</span>
         <h2>Cartesi v0.20.0 — Release Highlights</h2>
         <div class="cols">
           <div class="col">
@@ -1730,7 +1685,7 @@
          SLIDE 19 — RISC0 Step Prover Workflow
     ══════════════════════════════════════════════════════════ -->
       <section class="slide">
-        <span class="slide-num">19 / 27</span>
+        <span class="slide-num">18 / 26</span>
         <h2>RISC0 Step Prover Workflow</h2>
         <div class="cols">
           <div class="col-60">
@@ -1783,7 +1738,7 @@ cast call $VERIFIER "verify(...)" $proof $PRE $POST
          SLIDE 20 — Target Architecture
     ══════════════════════════════════════════════════════════ -->
       <section class="slide">
-        <span class="slide-num">20 / 27</span>
+        <span class="slide-num">19 / 26</span>
         <h2>Target Architecture: DEAAP × RISC0 × Cartesi</h2>
         <div style="display:flex;gap:18px;flex:1;align-items:center;justify-content:center;padding:4px 0;">
           <!-- Left: Data pipeline -->
@@ -1836,7 +1791,7 @@ cast call $VERIFIER "verify(...)" $proof $PRE $POST
          SLIDE 21 — Hybrid Rollup
     ══════════════════════════════════════════════════════════ -->
       <section class="slide">
-        <span class="slide-num">21 / 27</span>
+        <span class="slide-num">20 / 26</span>
         <h2>Hybrid Rollup — Optimistic + ZK Fallback</h2>
         <div class="cols">
           <div class="col">
@@ -1885,7 +1840,7 @@ cast call $VERIFIER "verify(...)" $proof $PRE $POST
          SLIDE 22 — Demo A: EZKL Results
     ══════════════════════════════════════════════════════════ -->
       <section class="slide">
-        <span class="slide-num">22 / 27</span>
+        <span class="slide-num">21 / 26</span>
         <h2>Demo A — Verifiable Embedding (EZKL)</h2>
         <div class="cols">
           <div class="col">
@@ -1995,7 +1950,7 @@ cast call $VERIFIER "verify(...)" $proof $PRE $POST
          SLIDE 23 — Demo B: RISC0 × Cartesi Results
     ══════════════════════════════════════════════════════════ -->
       <section class="slide">
-        <span class="slide-num">23 / 27</span>
+        <span class="slide-num">22 / 26</span>
         <h2>Demo B — RISC0 × Cartesi Step Proof</h2>
         <div class="cols">
           <div class="col">
@@ -2097,7 +2052,7 @@ cast call $VERIFIER "verify(...)" $proof $PRE $POST
          SLIDE 24 — Demo Takeaways
     ══════════════════════════════════════════════════════════ -->
       <section class="slide">
-        <span class="slide-num">24 / 27</span>
+        <span class="slide-num">23 / 26</span>
         <h2>Demo Takeaways</h2>
         <div class="cols">
           <div class="col">
@@ -2142,7 +2097,7 @@ cast call $VERIFIER "verify(...)" $proof $PRE $POST
          SLIDE 25 — Future Directions
     ══════════════════════════════════════════════════════════ -->
       <section class="slide">
-        <span class="slide-num">25 / 27</span>
+        <span class="slide-num">24 / 26</span>
         <h2>Future Directions</h2>
         <div class="cols">
           <div class="col">
@@ -2199,7 +2154,7 @@ cast call $VERIFIER "verify(...)" $proof $PRE $POST
          SLIDE 26 — Limitations & Outlook
     ══════════════════════════════════════════════════════════ -->
       <section class="slide">
-        <span class="slide-num">26 / 27</span>
+        <span class="slide-num">25 / 26</span>
         <h2>Limitations &amp; Outlook</h2>
         <div class="cols">
           <div class="col">
@@ -2248,7 +2203,7 @@ cast call $VERIFIER "verify(...)" $proof $PRE $POST
          SLIDE 27 — Q&A
     ══════════════════════════════════════════════════════════ -->
       <section class="slide title-slide">
-        <span class="slide-num">27 / 27</span>
+        <span class="slide-num">26 / 26</span>
         <div style="max-width:820px;text-align:center;">
           <h1 style="margin-bottom:20px;">Q &amp; A</h1>
           <div style="font-size:1.1rem;color:var(--muted);margin-bottom:32px;">
