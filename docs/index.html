@@ -1384,30 +1384,30 @@
             </div>
           </div>
           <div class="col">
-            <h3>Performance comparison</h3>
-            <table>
-              <tr>
-                <th>Approach</th>
-                <th>Prove time</th>
-              </tr>
-              <tr>
-                <td>General zkVM baseline<br><small>(1M × 128-dim)</small></td>
-                <td>Several hours</td>
-              </tr>
-              <tr>
-                <td><strong>zkRAG</strong></td>
-                <td><strong>~50 seconds</strong></td>
-              </tr>
-            </table>
-            <div class="callout green mt16">
-              <strong>~1000× speedup</strong> over a naive zkVM approach
+            <h3>Design insight</h3>
+            <div class="callout">
+              <strong>Prove the trace, not re-execute</strong><br>
+              Verifying a sorted output is $O(n)$; sorting inside a circuit is far more expensive.<br>
+              zkRAG applies the same principle to HNSW: prover runs the search, then proves the trace is valid.
             </div>
             <div class="mt16">
-              <h3>Design insight</h3>
-              <div class="callout">
-                <strong>Prove the trace, not re-execute</strong><br>
-                Verifying a sorted output is $O(n)$; sorting inside a circuit is far more expensive.<br>
-                zkRAG applies the same principle to HNSW: prover runs the search, then proves the trace is valid.
+              <h3>Performance comparison</h3>
+              <table>
+                <tr>
+                  <th>Approach</th>
+                  <th>Prove time</th>
+                </tr>
+                <tr>
+                  <td>General zkVM baseline<br><small>(1M × 128-dim)</small></td>
+                  <td>Several hours</td>
+                </tr>
+                <tr>
+                  <td><strong>zkRAG</strong></td>
+                  <td><strong>~50 seconds</strong></td>
+                </tr>
+              </table>
+              <div class="callout green mt16">
+                <strong>~1000× speedup</strong> over a naive zkVM approach
               </div>
             </div>
           </div>
